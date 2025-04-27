@@ -15,17 +15,6 @@
 
         <br>
 
-
-        <!-- Présentation avec image -->
-        <section class="presentation">
-            <h2> Notre mission ? </h2>
-            <p> EcoRide est une plateforme de covoiturage dédiée aux trajets en voiture pour réduire l'impact environnemental. Rejoignez une communauté de voyageurs engagés. </p>
-            <img src="images/Nature1.png" alt="Image écologique" />
-            <img src="images/Nature2.png" alt="Image écologique" />
-            <img src="images/Nature3.png" alt="Image écologique" />
-
-        </section>
-
         <!-- Menu de l'application -->
 
         <nav>
@@ -36,6 +25,36 @@
                 <li><a href="#contact" class="menu-item"> Contact </a></li>
             </ul>
         </nav>
+
+        <!-- Formulaire de recherche -->
+
+        <section id="search-form">
+            <h2> Rechercher un covoiturage </h2>
+            <form action="rechercher_covoiturage.php" method="GET">
+                <label for="depart">Ville de départ :</label>
+                <input type="text" id="depart" name="depart" placeholder="Ville de départ" required>
+
+                <label for="arrivee"> Ville d'arrivée :</label>
+                <input type="text" id="arrivee" name="arrivee" placeholder="Ville d'arrivée" required>
+
+                <label for="date"> Date du voyage </label>
+                <input type="date" id="date" name="date" required>
+
+                <button type="submit">Rechercher</button>
+            </form>
+        </section>
+
+
+
+        <!-- Présentation avec image -->
+        <section class="presentation">
+            <h2> Notre mission ? </h2>
+            <p> EcoRide est une plateforme de covoiturage dédiée aux trajets en voiture pour réduire l'impact environnemental. Rejoignez une communauté de voyageurs engagés. </p>
+            <img src="images/Nature1.png" alt="Image écologique" />
+            <img src="images/Nature2.png" alt="Image écologique" />
+            <img src="images/Nature3.png" alt="Image écologique" />
+
+        </section>
 
         <!-- Barre de recherche -->
         <section class="recherche">
