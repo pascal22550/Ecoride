@@ -2,6 +2,14 @@
 
 class HomeController {
     public function index() {
-        require_once './views/home.php';
+
+    $entreprise = [
+        'nom' => 'EcoRide',
+        'description' => 'Une solution de covoiturage écoresponsable pour les trajets du quotidien. ',
+        'image' => 'public/image.jpg'
+    ];
+
+    // Rendre la vue avec les données
+    include 'views/home.php';
     }
 }

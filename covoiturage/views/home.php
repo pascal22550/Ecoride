@@ -2,39 +2,27 @@
 <html lang="fr">
     <head>
         <meta charset="UTF-8">
-        <title>Covoiturage Ecologique - Accueil</title>
+        <title><?= $entreprise['nom'] ?></title>
         <link rel="stylesheet" href="/public/style.css">
     </head>
     <body>
         <header>        
-            <h1>Covoiturage Ecologique </h1>
-            <nav>
-                <a href="/">Accueil</a>
-                <a href="/trajets">Trajets</a>
-                <a href="/connexion">Connexion</a>
-            </nav>
+            <h1><?= $entreprise['nom'] ?> </h1>
         </header>
-
+        
         <main>
-            <section>
-                <h2> Bienvenue sur notre plateforme </h2>
-                <p>
-                    Notre objectif : réduire les émissions de CO2 grâce au covoiturage.
-                    Trouvez ou proposez des trajets partagés, gagnez des crédits, et aidez la planè<template></template>
-                </p>
-            </section>
+            <img src="public/Nature1.png"<?= $entreprise['image'] ?>" alt="Image entreprise" width="300">
+            <p><?= $entreprise['description'] ?></p>
+
+            <form action="index.php" method="GET">
+                <input type="hidden" name="route" value="search">
+                <input type="text" name="query" placeholder="Rechercher un trajet...">
+                <button type="submit">Rechercher</button>
+            </form>
         </main>
 
         <footer>
-            <p> Copyright 2025 Covoiturage Ecologique - Tous droits réservés </p>
+            <p>&copy; 2025 EcoRide - Tous droits réservés.</p>
         </footer>
     </body>
     </html>
-
-
-
-
-
-
-
-</html>
