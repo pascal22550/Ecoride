@@ -1,22 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Inscription</title>
+    <h1>Inscription</h1>
 </head>
 <body>
-    <h1>Formulaire d'inscription</h1>
+
     <form action="index.php?page=register" method="POST">
-        <label for="username">Nom d'utilisateur :</label>
-        <input type="text" name="username" id="username" required><br><br>
+        <label for="firstname">Prenom : </label>
+        <input type="text" id="firstname" name="firstname" required><br>
+
+        <label for="lastname">Nom :</label>
+        <input type="text" id="lastname" name="lastname" required><br>
 
         <label for="email">Email :</label>
-        <input type="email" name="email" id="email" required><br><br>
+        <input type="email" id="email" name="email" required><br>
 
-        <label for="password">Mot de passe :</label>
-        <input type="password" name="password" id="password" required><br><br>
+        <label for="password">Mot de passe : </label>
+        <input type="password" id="password" name="password" required><br>
 
-        <input type="submit" value="S'inscrire">
+        <button type="submit">S'inscire</button>
+
+
     </form>
-</body>
-</html>
-
