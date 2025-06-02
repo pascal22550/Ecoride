@@ -1,14 +1,19 @@
 <?php
 
 require_once './controllers/HomeController.php';
+require_once './controllers/UserController.php';
 
-$uri = $_SERVER['REQUEST_URI'];
+$page = $_GET['page'] ?? 'home';
 
-switch ($uri) {
-    case '/':
-    case '/index.php';
+switch ($page) {
+    case 'home':
         $controller = new HomeController();
-        $controller-> index();
+        $controller->index();
+        break;
+
+    case 'register':
+        $controller = new UserController();
+        $controller->register();
         break;
 
     default:
@@ -16,3 +21,4 @@ switch ($uri) {
         echo "Page non trouvée.";
         break;
 }
+
