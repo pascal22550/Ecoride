@@ -3,17 +3,26 @@
 class UserController {
     public function register() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require_once './config/database.php'; // inclure la connexion PDO
             // Traitement du formulaire
             $firstname = $_POST['firstname'];
             $lastname = $_POST['lastname'];
             $email = $_POST['email'];
             $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-            // Ici on simulera un enregistrement plus tard en base de données
-            echo "<p> Merci pour votre inscription, $firstname $lastname !</p>";
-        }
+            try {
 
-        // Affichage du formulaire
-        require './views/register.php';
+                $stmt = $pdo->prepare("INSERT INTO users (firstname, lastname, email, password) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$firstname, $lastname, $email, $password]);
+
+                echo "<p> Inscriptioni réussie ! Bienvenue $firstname ! </p>";
+            } catch (PDOException $e) {
+                echo "Erreur lors de l'inscription : " . $e->getMessage();
+
+            }
+        }
+        
+        require 'views/register.php';
     }
 }
+
