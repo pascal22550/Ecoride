@@ -16,6 +16,12 @@ switch ($page) {
         $controller->register();
         break;
 
+    case 'admin-users':
+        // si l'URL contient $page=admin-users, on appelle la méthode adminUsers() du contrôleur
+        $controller = new UserController();
+        $controller->adminusers();
+        break;
+
     default:
         http_response_code(404);
         echo "Page non trouvée.";
