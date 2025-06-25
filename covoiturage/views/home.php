@@ -12,7 +12,15 @@
 
         <a href="/">Accueil</a>
         <a href="/trajets">Trajets</a>
-        <a href="/connexion">Connexion</a>
+        <!-- Ajout bouton connexion et inscription -->
+        <?php if (!empty($_SESSION['firstname'])): ?>
+        <a href="index.php?page=profile">Mon espace</a>
+        <a href="index.php?page=logout">Deconnexion</a>
+        <?php else: ?>
+          <a href="index.php?page=login">Connexion</a>
+          <a href="index.php?page=register">Inscription</a>
+        <?php endif; ?>
+
     </nav>
     <p><a href="index.php?page=register">S'inscrire</a></p>
 </body>
@@ -42,3 +50,12 @@
 </html>
 
 </html>
+
+<?php
+/* Vérification du bon fonctionnement de la connexion de la session */
+session_start();
+if (!empty($_SESSION['firstname'])) {
+  echo "<p>Bonjour, " . htmlspecialchars($_SESSION['firstname']) . " Bravo</p>";
+}
+?>
+

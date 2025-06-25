@@ -28,6 +28,24 @@ switch ($page) {
         $controller->login();
         break;
 
+    /* Ajout nouvelle route pour se deconnecter */
+    case 'logout':
+        session_start();
+        session_destroy();
+        header('Location: index.php?page=home');
+        exit;
+        break;
+
+    /* Ajout nouvelle route pour le profil utilisateur */
+    case 'profile':
+        session_start();
+        if (!isset($_SESSIOn['firstname'])) {
+            header('Location: index.php?page=login');
+            exit;
+        }
+        require 'views/user_profile.php';
+        break;
+
     default:
         http_response_code(404);
         echo "Page non trouvée.";
