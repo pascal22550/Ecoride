@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <h1>Inscription</h1>
+    <meta charset="UTF-8">
+    <title>Inscription</title>
 </head>
 <body>
 
+    <h1> Inscription </h1>
+
     <?php if (!empty($error)): ?>
-        <p style="color:red;"><?= $error ?> </p>
+        <p style="color:red;"><?= htmlspecialchars($error) ?> </p>
     <?php endif; ?>
 
-    <?php if (!empty($sucess)): ?>
-        <p style="color:green;"><?= $sucess ?></p>
+    <?php if (!empty($success)): ?>
+        <p style="color:green;"><?= htmlspecialchars($success) ?></p>
     <?php endif; ?>
     
     <form action="index.php?page=register" method="POST">

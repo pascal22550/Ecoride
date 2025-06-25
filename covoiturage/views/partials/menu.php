@@ -1,0 +1,1 @@
+<a href="index.php?page=login">Se connecter</a>

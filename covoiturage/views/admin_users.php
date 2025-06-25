@@ -19,6 +19,7 @@
         </tr>
     </thead>
     <tbody>
+
         <?php foreach ($users as $user): ?>
         <!-- On boucle sur chaque utilisateur pour afficher ses données -->
         <tr>

@@ -7,52 +7,111 @@ require_once(__DIR__ . '/../config/database.php');
 class UserController {
 
 public function adminUsers() {
+    // Connexion à la base de données via la fonction connectDB()
     $db = connectDB();
+
+    // Vérification si la connexion à échoué
     if (!$db) {
         echo "Connexion à la base de données échouée.";
         return;
     }
 
     try {
-        $users = $db->query("SELECT * FROM users")->fetchAll();
+
+        // Execution de la requête SQL pour récupérer tous les utilisateurs
+        $stmt = $db->query("SELECT id, firstname, lastname, email, credits, created_at FROM users");
+
+        // On récupère les résultats dans un tableau associatif
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+        // Chargement de la vue qui affichera le tableau HTML
         require 'views/admin_users.php';
     } catch (PDOException $e) {
+        // Affichage d'un message en cas d'erreur SQL
         echo "Erreur lors de la récupération des utilisateurs : " . $e->getMessage();
+        $users = []; // Pour éviter une erreur si la variable est utilisée dans la vue
+        require 'views/admin_users.php';
     }
 }
 
-    public function register() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            require_once './config/database.php'; // inclure la connexion PDO
-            // Traitement du formulaire
-            $firstname = $_POST['firstname'];
-            $lastname = $_POST['lastname'];
-            $email = $_POST['email'];
-            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+public function register() {
+    $error = '';
+    $success = '';
 
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $firstname = trim($_POST['firstname'] ?? '');
+        $lastname  = trim($_POST['lastname'] ?? '');
+        $email     = trim($_POST['email'] ?? '');
+        $password  = $_POST['password'] ?? '';
+
+        $db = connectDB();
+        if (!$db) {
+            $error = "Connexion à la base de données échouée.";
+        } else {
             try {
-                global $pdo;
+                // Vérifier si l'email existe déjà
+                $check = $db->prepare("SELECT id FROM users WHERE email = ?");
+                $check->execute([$email]);
 
-                // Vérification si l'email existe déjà
-
-                $checkStmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
-                $checkStmt->execute([$email]);
-
-                if ($checkStmt->rowCount() > 0) {
+                if ($check->rowCount() > 0) {
                     $error = "Cet email est déjà utilisé. Veuillez en choisir un autre.";
                 } else {
-                    // Insertion si l'email est libre
-                    $stmt = $pdo->prepare("INSERT INTO users (firstname, lastname, email, password) VALUES(?, ?, ?, ?)");
-                    $stmt->execute([$firstname, $lastname, $email, $password]);
+                    // Hasher le mot de passe
+                    $hash = password_hash($password, PASSWORD_DEFAULT);
 
-                    $success = "Inscription réussie ! Bienvenue $firstname 🎉";
+                    // Insérer le nouvel utilisateur
+                    $stmt = $db->prepare("INSERT INTO users (firstname, lastname, email, password) VALUES (?, ?, ?, ?)");
+                    $stmt->execute([$firstname, $lastname, $email, $hash]);
+
+                    $success = "Inscription réussie ! Bienvenue, $firstname 🎉";
                 }
             } catch (PDOException $e) {
                 $error = "Erreur lors de l'inscription : " . $e->getMessage();
             }
         }
+    }
 
-        // Affichage de la vue avec message
-        require 'views/register.php';
+    require __DIR__ . '/../views/register.php';
+    }
+
+    public function login() {
+        $error = '';
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $email = trim($_POST['email'] ?? '');
+            $password = $_POST['password'] ?? '';
+
+            $db = connectDB();
+            if (!$db) {
+                $error = "Connexion à la base de données échouée.";
+            } else {
+                try {
+                    $stmt = $db->prepare("SELECT * FROM users WHERE email = ?");
+                    $stmt->execute([$email]);
+                    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    if ($user && password_verify($password, $user['password'])) {
+                        // Démarrer la session
+                        session_start();
+                        $_SESSION['user_id'] = $user['id'];
+                        $_SESSION['firstname'] = $user['firstname'];
+                        $_SESSION['email'] = $user['email'];
+
+                        // Rediriger vers la page d'accueil ou tableau de bord
+                        header('Location: index.php?page=home');
+                        exit;
+                    } else {
+                        $error = "Identifiants inccorects.";
+                    }
+                }   catch (PDOException $e) {
+                    $error = "Erreur los de la connexion : " . $e->getMessage(); 
+                }
+
+            }
+        }
+
+        require 'views/login.php';
     }
 }
+    

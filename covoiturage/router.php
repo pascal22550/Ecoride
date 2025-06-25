@@ -22,6 +22,12 @@ switch ($page) {
         $controller->adminusers();
         break;
 
+    /* Ajout nouvelle route login dans router */
+    case 'login':
+        $controller = new UserController();
+        $controller->login();
+        break;
+
     default:
         http_response_code(404);
         echo "Page non trouvée.";
