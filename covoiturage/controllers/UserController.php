@@ -113,5 +113,27 @@ public function register() {
 
         require 'views/login.php';
     }
+    
+    public function profile() {
+        if (empty($_SESSION['user_id'])){
+            header('Location: index.php?page=login');
+            exit;
+        }
+
+        $db = connectDB();
+        $user = null; // garantit que $user existe même en cas d'erreur
+
+        try {
+            $stmt = $db->prepare("SELECT firstname, lastname, email, credits FROM users WHERE id = ?");
+            $stmt->execute([$_SESSION['user_id']]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        } catch (PDOException $e) {
+            echo "Erreur de chargement du profil : " . $e->getMessage();
+        }
+
+        require 'views/profile.php';
+
+    }
 }
     

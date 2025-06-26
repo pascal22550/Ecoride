@@ -1,5 +1,7 @@
 <?php
 
+session_start(); 
+
 require_once './controllers/HomeController.php';
 require_once './controllers/UserController.php';
 
@@ -38,12 +40,8 @@ switch ($page) {
 
     /* Ajout nouvelle route pour le profil utilisateur */
     case 'profile':
-        session_start();
-        if (!isset($_SESSIOn['firstname'])) {
-            header('Location: index.php?page=login');
-            exit;
-        }
-        require 'views/user_profile.php';
+        $controller = new UserController();
+        $controller->profile(); 
         break;
 
     default:
