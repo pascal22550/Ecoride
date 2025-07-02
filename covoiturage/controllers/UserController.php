@@ -135,5 +135,57 @@ public function register() {
         require 'views/profile.php';
 
     }
+
+    public function editProfile() {
+        if (empty($_SESSION['user_id'])) {
+            header('Location: index.php?page=login');
+            exit;
+        }
+
+        $db = connectDB();
+        $error = '';
+        $success = '';
+
+        // Charger les infos actuelles de l'utilisateur
+        $stmt = $db->prepare("SELECT firstname, lastname, email FROM users WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $firstname = trim($_POST['firstname']);
+            $lastname = trim($_POST['lastname']);
+            $email = trim($_POST['email']);
+            $password = $_POST['password'] ?? '';
+
+            try {
+                // préparer la requête SQL
+                if (!empty($password)) {
+                    $hashed = password_hash($password, PASSWORD_DEFAULT);
+                    $stmt = $db->prepare("UPDATE users SET firstname = ?, lastname = ?, email = ?, password = ? WHERE id = ?");
+                    $stmt->execute([$firstname, $lastname, $email, $hashed, $_SESSION['user_id']]);
+                } else {
+                    $stmt = $db->prepare("UPDATE users SET firstname = ?, lastname = ?, email = ? WHERE id = ?");
+                    $stmt->execute([$firstname, $lastname, $email, $_SESSION['user_id']]);
+                }
+
+
+                $success = "Profil mis à jour avec succès";
+
+                // Mettre à jour la session si prénom changé
+                $_SESSION['firstname'] = $firstname;
+
+                // Ajouter le message flash et rediriger
+                $_SESSION['flash_success'] = " Profil mis à jour avec succès.";
+                header('Location: index.php?page=profile');
+                exit;
+
+            } catch (PDOException $e) {
+                $error = "Erreur lors de la mise à jour : " . $e->getMessage();
+            }
+        }
+            
+        require 'views/edit_profile.php';    
+
+    }
 }
     

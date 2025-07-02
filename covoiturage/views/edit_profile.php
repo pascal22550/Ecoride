@@ -17,7 +17,7 @@
 
 <form method="POST" action="index.php?page=edit-profile">
     <label>Prénom : </label>
-        <input type="text" name="firstname" value="<?= htmlspecialchars($user['firstnam']) ?>" required>
+        <input type="text" name="firstname" value="<?= htmlspecialchars($user['firstname']) ?>" required>
     </label><br>
 
     <label>Nom : </label>

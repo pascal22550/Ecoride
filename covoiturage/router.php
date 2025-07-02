@@ -44,6 +44,12 @@ switch ($page) {
         $controller->profile(); 
         break;
 
+    /* Ajouter nouvelle pour route pour modifier le profil utilisateur */
+    case 'edit-profile':
+        $controller = new UserController();
+        $controller->editProfile();
+        break;
+
     default:
         http_response_code(404);
         echo "Page non trouvée.";
