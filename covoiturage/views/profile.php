@@ -6,7 +6,7 @@ if (!empty($_SESSION['flash_success'])):
     unset($_SESSION['flash_success']); // on l'efface après l'affichage
 endif;
 ?>
-
+<pre><?php print_r($user); ?></pre>
 <?php if (!empty($user)): ?>
     <p><strong>Prénom : </strong> <?= htmlspecialchars($user['firstname']) ?></p>
     <p><strong>Nom : </strong> <?= htmlspecialchars($user['lastname']) ?></p>
@@ -22,4 +22,74 @@ endif;
     </a>
 </p>
 
+<p>
+    <a href="index.php?page=select-role">
+        <button> Declarer mon rôle (chauffeur / passager) </button>
+    </a>
+</p>
 
+<?php 
+// Vérifie si l'utilisateur est défini comme chauffeur 
+// Cela signifie que la clé "is_driver" existe et qu'elle a une valeur "vraie"
+if (!empty($user['is_driver']) && $user['is_driver'] == 1): ?>
+    <!-- Si l'utilisateur est chauffeur, on affiche un bouton pour ajouter un véhicule -->
+    <p>
+        <a href="index.php?page=add-vehicle">
+            <button>Ajouter un véhicule</button>
+        </a>
+    </p>
+<?php endif; ?> <!-- Fin de la condition -->
+
+<?php if (!empty($vehicles)): ?>
+
+    <h3>Mes Véhicules</h3>
+    <table border="1" cellpadding="5" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Marque</th>
+                <th>Modèle</th>
+                <th>Couleur</th>
+                <th>Energie</th>
+                <th>Immatriculation</th>
+                <th>Places</th>
+                <th>Préférences</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($vehicles as $v) : ?>
+                <tr>
+                    <td><?= htmlspecialchars($v['brand']) ?></td>
+                    <td><?= htmlspecialchars($v['model']) ?></td>
+                    <td><?= htmlspecialchars($v['color']) ?></td>
+                    <td><?= htmlspecialchars($v['energy']) ?></td>
+                    <td><?= htmlspecialchars($v['plate_number']) ?></td>
+                    <td><?= htmlspecialchars($v['seats']) ?></td>
+                    <td><?= htmlspecialchars($v['preferences']) ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php else: ?>
+    <p>Aucun véhicule enregistré.</p>
+<?php endif; ?>
+
+
+
+
+
+
+
+
+
+
+
+
+                </tr>
+        </tbody>
+            </tr>
+        </thead>
+
+
+
+
+    </table>

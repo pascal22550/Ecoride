@@ -50,6 +50,20 @@ switch ($page) {
         $controller->editProfile();
         break;
 
+    /* Ajouter la selection du role de l'utilisateur */
+    case 'select-role':
+        $controller = new UserController();
+        $controller->selectRole();
+        break;
+
+    /* Ajouter la possibilité d'ajouter un véhicule */
+    case 'add-vehicle':
+        $controller = new UserController();
+        $controller->addVehicle();
+        break;
+
+
+    /* Page qui s'affiche en cas d'erreur */
     default:
         http_response_code(404);
         echo "Page non trouvée.";

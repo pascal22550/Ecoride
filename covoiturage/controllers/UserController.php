@@ -122,11 +122,19 @@ public function register() {
 
         $db = connectDB();
         $user = null; // garantit que $user existe même en cas d'erreur
+        $vehicles = [];
 
         try {
-            $stmt = $db->prepare("SELECT firstname, lastname, email, credits FROM users WHERE id = ?");
+            // Chargement des infos utilisateur
+            $stmt = $db->prepare("SELECT firstname, lastname, email, credits, is_driver FROM users WHERE id = ?");
             $stmt->execute([$_SESSION['user_id']]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+
+            // Chargement des véhicules du user connecté
+            $stmt = $db->prepare("SELECT * FROM vehicles WHERE user_id = ?");
+            $stmt->execute([$_SESSION['user_id']]);
+            $vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         } catch (PDOException $e) {
             echo "Erreur de chargement du profil : " . $e->getMessage();
@@ -184,7 +192,82 @@ public function register() {
             }
         }
             
-        require 'views/edit_profile.php';    
+        require 'views/edit_profile.php';   
+
+    }
+
+    public function selectRole() {
+        if (empty($_SESSION['user_id'])) {
+            header('Location: index.php?page=login');
+            exit;
+        }
+
+        $db = connectDB();
+
+        // Charger les valeurs actuelles de l'utilisateur
+        $stmt = $db->prepare("SELECT is_driver, is_passenger FROM users WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST'){
+            // Vérifie si les cases sont cochées
+            $is_driver = isset($_POST['is_driver']) ? 1 : 0;
+            $is_passenger = isset($_POST['is_passenger']) ? 1 : 0;
+
+            // Mise à jour dans la BDD
+            $stmt = $db->prepare("UPDATE users SET is_driver = ?, is_passenger = ? WHERE id = ?");
+            $stmt->execute([$is_driver, $is_passenger, $_SESSION['user_id']]);
+
+            $_SESSION['flash_success'] = "Votre rôle a bien été enregistré";
+            header('Location: index.php?page=profile');
+            exit;
+        }
+
+        require 'views/select_role.php';
+    }
+
+    public function addVehicle() {
+        // Vérifie si l'utilisateur est connecté en consultant la session
+        if (empty($_SESSION['user_id'])) {
+            // Si non connecté, redirige vers la page de connexion
+            header('Location: index.php?page=login');
+            exit;
+        }
+
+        // Connexion à la base de données
+        $db = connectDB();
+
+
+        // Si le formulaire a été soumis en méthode POST
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Prépare une requête SQL pour insérer un nouveau véhicule dans la base 
+            $stmt = $db->prepare("INSERT INTO vehicles
+            (user_id, brand, model, color, energy, plate_number, registration_date, seats, preferences)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+            // Exécute la requête avec les données du formulaire et l'identifiant de l'utilisateur
+            $stmt->execute([
+                $_SESSION['user_id'],
+                $_POST['brand'],
+                $_POST['model'],
+                $_POST['color'],
+                $_POST['energy'],
+                $_POST['plate_number'],
+                $_POST['registration_date'],
+                $_POST['seats'],
+                $_POST['preferences']
+            ]);
+
+            // Message flash pour confirmer l'ajout du véhicule
+            $_SESSION['flash_success'] = " Véhicule ajouté avec succès.";
+           
+            // Redirige vers la page de profil après insertion
+            header('Location: index.php?page=profile');
+            exit;
+        }
+
+    // Si le formulaire n'a pas été soumis, on affiche la vue du formulaire
+    require 'views/add_vehicle.php';
 
     }
 }
