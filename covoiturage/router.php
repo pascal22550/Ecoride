@@ -62,6 +62,11 @@ switch ($page) {
         $controller->addVehicle();
         break;
 
+    /* Ajouter la possibilité d'ajouter un trajet */
+    case 'add-trip':
+        $controller = new UserController();
+        $controller->addTrip();
+        break;
 
     /* Page qui s'affiche en cas d'erreur */
     default:

@@ -136,6 +136,15 @@ public function register() {
             $stmt->execute([$_SESSION['user_id']]);
             $vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+            // Charger les trajets créés par l'utilisateur connecté (chauffeur)
+            $stmt = $db->prepare("SELECT t.*, v.brand, v.model, v.plate_number
+                                  FROM trips t
+                                  JOIN vehicles v ON t.vehicle_id = v.id
+                                  WHERE t.user_id = ?
+                                  ORDER BY t.departure_datetime DESC");
+            $stmt->execute([$_SESSION['user_id']]);
+            $trips = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
         } catch (PDOException $e) {
             echo "Erreur de chargement du profil : " . $e->getMessage();
         }
@@ -269,6 +278,44 @@ public function register() {
     // Si le formulaire n'a pas été soumis, on affiche la vue du formulaire
     require 'views/add_vehicle.php';
 
+    }
+
+    public function addTrip() {
+        if (empty($_SESSION['user_id'])) {
+            header('Location: index.php?page=login');
+            exit;
+        }
+
+        $db = connectDB();
+
+        // Charger les véhicules du chauffeur
+        $stmt = $db->prepare("SELECT * FROM vehicles WHERE user_id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $stmt = $db->prepare("INSERT INTO trips
+                (user_id, vehicle_id, departure_city, arrival_city, departure_datetime, seats_available, price)
+                VALUES (?, ?, ?, ?, ?, ?, ?)");
+
+            $stmt->execute([
+
+                $_SESSION['user_id'],
+                $_POST['vehicle_id'],
+                $_POST['departure_city'],
+                $_POST['arrival_city'],
+                $_POST['departure_datetime'],
+                $_POST['seats_available'],
+                $_POST['price'],
+            ]);
+
+            $_SESSION['flash_success'] = " Trajet créé avec succès.";
+            header('Location: index.php?page=profile');
+            exit;
+            
+        }
+
+        require 'views/add_trip.php';
     }
 }
     

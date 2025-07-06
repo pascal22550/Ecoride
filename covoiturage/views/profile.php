@@ -73,23 +73,45 @@ if (!empty($user['is_driver']) && $user['is_driver'] == 1): ?>
     <p>Aucun véhicule enregistré.</p>
 <?php endif; ?>
 
+<?php if (!empty($trips)): ?>
+    <h3> Mes trajets </h3>
 
-
-
-
-
-
-
-
-
-
-
-                </tr>
-        </tbody>
+    <table border="1" cellpadding="5" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Départ</th> <!-- Ville de départ -->
+                <th>Arrivée</th> <!-- Ville d'arrivée -->
+                <th>Date & Heure </th> <!-- Date et heure du trajet -->
+                <th>Véhicules</th> <!-- Infos sur le véhicule utilisé -->
+                <th>Places</th> <!-- Nombre de places disponibles -->
+                <th>Prix (euro)</th> <!-- Prix par passager -->
             </tr>
         </thead>
-
-
-
-
+        <tbody>
+            <!-- Boucle sur tous les trajets -->
+             <?php foreach ($trips as $trip): ?>
+                <tr>
+                    <td><?= htmlspecialchars($trip['departure_city']) ?>
+                    <td><?= htmlspecialchars($trip['arrival_city']) ?>
+                    <td><?= date('d/m/Y H:i', strtotime($trip['departure_city'])) ?>
+                    <td><?= htmlspecialchars($trip['brand']) ?>
+                    <td><?= htmlspecialchars($trip['seats_available']) ?>
+                    <td><?= htmlspecialchars($trip['price']); ?> euros
+                
+                </td>
+            <?php endforeach; ?>
+        </tbody>
     </table>
+<?php else: ?>
+    <!-- Si aucun trajet n'est enregistré -->
+     <p> Aucun trajet enregistré. </p>
+<?php endif; ?>
+
+<!-- Ajouter un bouton "ajouter un trajet dans le profil chauffeur" -->
+<?php if (!empty($user['is_driver']) && $user['is_driver'] == 1): ?>
+    <p>
+        <a href="index.php?page=add-trip">
+            <button>Ajouter un trajet</button>
+        </a>
+    </p>
+<?php endif; ?>
