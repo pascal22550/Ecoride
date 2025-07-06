@@ -317,5 +317,71 @@ public function register() {
 
         require 'views/add_trip.php';
     }
+
+    public function deleteTrip() {
+        if (empty($_SESSION['user_id'])) {
+            header('Location: index.php?page=login');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['trip_id'])) {
+            $trip_id = $_POST['trip_id'];
+
+            $db = connectDB();
+
+            // Supprimer uniquement si l'utilisateur en est le propriétaire
+            $stmt = $db->prepare("DELETE FROM trips WHERE id = ? AND user_id = ?");
+            $stmt->execute([$trip_id, $_SESSION['user_id']]);
+
+            $_SESSION['flash_success'] = " Trajet supprimé avec succès.";            
+        }
+
+        header('Location: index.php?page=profile');
+        exit;
+    }
+
+    public function editTrip() {
+        if (empty($_SESSION['user_id'])) {
+            header('Location: index.php?page=login');
+            exit;
+        }
+
+        $db = connectDB();
+        $trip_id = $_GET['id'] ?? null;
+
+        // Charger le trajet actuel
+        $stmt = $db->prepare("SELECT * FROM trips WHERE id = ? AND user_id = ?");
+        $stmt->execute([$trip_id, $_SESSION['user_id']]);
+        $trip = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$trip) {
+            $_SESSION['flash_success'] = "Trajet introuvable.";
+            header('Location: index.php?page=profile');
+            exit;
+        }
+
+        // Si soumission du formulaire
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $stmt = $db->prepare("UPDATE trips SET departure_city = ?, arrival_city = ?, departure_datetime = ?, seats_available = ?, price = ? WHERE id = ? AND user_id = ?");
+            $stmt->execute([
+                $_POST['departure_city'],
+                $_POST['arrival_city'],
+                $_POST['departure_datetime'],
+                $_POST['seats_available'],
+                $_POST['price'],
+                $trip_id,
+                $_SESSION['user_id']                
+            ]);
+
+            $_SESSION['flash_success'] = "Trajet modifié avec succès.";
+            header('Location: index.php?page=profile');
+            exit;
+        }
+
+        // Afficher le formulaire
+        require 'views/edit_trip.php';
+    }
+
 }
+
     

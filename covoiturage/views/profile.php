@@ -85,6 +85,7 @@ if (!empty($user['is_driver']) && $user['is_driver'] == 1): ?>
                 <th>Véhicules</th> <!-- Infos sur le véhicule utilisé -->
                 <th>Places</th> <!-- Nombre de places disponibles -->
                 <th>Prix (euro)</th> <!-- Prix par passager -->
+                <th>Actions</th> <!-- Colonne pour modifier/supprimer -->
             </tr>
         </thead>
         <tbody>
@@ -97,7 +98,18 @@ if (!empty($user['is_driver']) && $user['is_driver'] == 1): ?>
                     <td><?= htmlspecialchars($trip['brand']) ?>
                     <td><?= htmlspecialchars($trip['seats_available']) ?>
                     <td><?= htmlspecialchars($trip['price']); ?> euros
-                
+                    <td>
+                        <!-- Formulaire pour supprimer un trajet -->
+                        <form method="POST" action="index.php?page=delete-trip" onsubmit="return confirm('Supprimer ce trajet ?');">
+                            <input type="hidden" name="trip_id" value="<?= $trip['id'] ?>">
+                            <button type="submit"> Supprimer</button>
+                        </form>
+
+                        <!-- Formulaire pour modifier un trajet -->
+                        <a href="index.php?page=edit-trip&id=<?= $trip['id'] ?>">
+                            <button> Modifier</button>
+                        </a>
+                    </td>
                 </td>
             <?php endforeach; ?>
         </tbody>

@@ -68,6 +68,18 @@ switch ($page) {
         $controller->addTrip();
         break;
 
+    /* Ajouter la possibilité de supprimer un trajet */
+    case 'delete-trip':
+        $controller = new UserController();
+        $controller->deleteTrip();
+        break;
+
+    /* Ajouter une route dans router.php */
+    case 'edit-trip' :
+        $controller = new UserController();
+        $controller->editTrip();
+        break;
+
     /* Page qui s'affiche en cas d'erreur */
     default:
         http_response_code(404);
