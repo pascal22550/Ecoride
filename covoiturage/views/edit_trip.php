@@ -13,6 +13,10 @@
         <input type="datetime-local" name="departure_datetime" value="<?= date('Y-m-d\TH:i', strtotime($trip['departure_datetime'])) ?>" required> 
     </label><br>
 
+    <label>Date et heure d'arrivée : ?
+        <input type="datetime-local" name="arrival_datetime" value="<?= date('Y-m-d\TH:i', strtotime($trip['arrival_datetime'])) ?>" required>
+    </label>
+
     <label>Place disponibles : /form>
         <input type="number" name="seats_available" value="<?= htmlspecialchars($trip['seats_available']) ?>" min="1" required>
     </label><br>

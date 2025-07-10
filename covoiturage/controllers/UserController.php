@@ -294,6 +294,9 @@ public function register() {
         $vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+            $arrival_datetime = $_POST['arrival_datetime']; 
+
             $stmt = $db->prepare("INSERT INTO trips
                 (user_id, vehicle_id, departure_city, arrival_city, departure_datetime, seats_available, price)
                 VALUES (?, ?, ?, ?, ?, ?, ?)");
@@ -307,6 +310,7 @@ public function register() {
                 $_POST['departure_datetime'],
                 $_POST['seats_available'],
                 $_POST['price'],
+                $arrival_datetime,
             ]);
 
             $_SESSION['flash_success'] = " Trajet créé avec succès.";
@@ -362,7 +366,8 @@ public function register() {
 
         // Si soumission du formulaire
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $stmt = $db->prepare("UPDATE trips SET departure_city = ?, arrival_city = ?, departure_datetime = ?, seats_available = ?, price = ? WHERE id = ? AND user_id = ?");
+
+            $stmt = $db->prepare("UPDATE trips SET departure_city = ?, arrival_city = ?, departure_datetime = ?, arrival_datetime = ?, seats_available = ?, price = ? WHERE id = ? AND user_id = ?");
             $stmt->execute([
                 $_POST['departure_city'],
                 $_POST['arrival_city'],

@@ -10,6 +10,7 @@
     </label>
 
     <label> Date et heure de départ : </label>
+        <label for="arrival_datetime">Date et heure d'arrivée estimée :</label>
         <input type="datetime-local" name="departure_datetime" required>
     </label><br>
 

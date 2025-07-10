@@ -4,6 +4,7 @@ session_start();
 
 require_once './controllers/HomeController.php';
 require_once './controllers/UserController.php';
+require_once './controllers/PublicController.php';
 
 $page = $_GET['page'] ?? 'home';
 
@@ -74,10 +75,27 @@ switch ($page) {
         $controller->deleteTrip();
         break;
 
-    /* Ajouter une route dans router.php */
+    /* Ajouter la possibilité de modifier un trajet */
     case 'edit-trip' :
         $controller = new UserController();
         $controller->editTrip();
+        break;
+
+    /* Ajouter la possibilite pour un visiteur de rechercher un trajet */
+    case 'search':
+        require 'views/search.php';
+        break;
+
+    /* Voir les résultats des recherches du visiteur */
+    case 'search-results':
+        $controller = new PublicController();
+        $controller->searchResults();
+        break;
+
+    /* Permettre à un visiteur de voir le detail d'un trajet */
+    case 'trip-details':
+        $controller = new PublicController();
+        $controller->tripDetails();
         break;
 
     /* Page qui s'affiche en cas d'erreur */
