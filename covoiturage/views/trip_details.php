@@ -3,7 +3,11 @@
 <p><strong>Conducteur : </strong></p> <?=htmlspecialchars(string: $trip['firstname']) ?></p>
 <p><strong>Départ : </strong> <?=htmlspecialchars(string: $trip['departure_city']) ?></p>
 <p><strong>Arrivée : </strong> <?= htmlspecialchars($trip['arrival_city']) ?></p>
-<p><strong>Date: </strong> <?= date('d/m/Y H:i', strtotime($trip['departure_datetim'])) ?></p>
+<?php if (!empty($trip['departure_datetime']) && strtotime($trip['departure_datetime']) !== false): ?>
+    <?= date('d/m/Y H:i', strtotime($trip['departure_datetime'])) ?>
+<?php else: ?>
+    <span class="text-muted">Date non définie</span>
+<?php endif; ?>
 <p><strong>Prix: </strong> <?= htmlspecialchars($trip['price']) ?> euros</p>
 <p><strong>Places restantes: </strong> <?= htmlspecialchars($trip['seats_available']) ?></p>
 

@@ -1,5 +1,6 @@
 <h2> Ajouter un trajet </h2>
 
+
 <form method="POST" action="index.php?page=add-trip">
     <label> Ville de départ:  /form>
         <input type="text" name="departure_city" required>
@@ -10,8 +11,11 @@
     </label>
 
     <label> Date et heure de départ : </label>
-        <label for="arrival_datetime">Date et heure d'arrivée estimée :</label>
         <input type="datetime-local" name="departure_datetime" required>
+    </label><br>
+
+    <label> Date et heure d'arrivée :
+        <input type="datetime-local" name="arrival_datetime" required>
     </label><br>
 
     <label>Nombre de places disponibles : 
@@ -24,13 +28,13 @@
 
 <label>Véhicules :
     <select name="vehicle_id" required>
-        <?php foreach ($vehicles as $vehicle): ?>
-            <option value="<?= $vehicle['id'] ?>">
-                <?= htmlspecialchars($vehicle['brand'] . ' ' . $vehicle['model'] . ' (' . $vehicle['plate_number'] . ')') ?>
+        <?php foreach ($vehicles as $v): ?>
+            <option value="<?= $v['id'] ?>">
+                <?= htmlspecialchars($v['brand'] . ' ' . $v['model'] . ' (' . $v['plate_number'] . ')') ?>
             </option>
         <?php endforeach; ?>
     </select>
-</label><br><br>
+</label><br>
 
 <button type="submit">Créer le trajet</button>
 

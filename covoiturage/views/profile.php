@@ -92,9 +92,19 @@ if (!empty($user['is_driver']) && $user['is_driver'] == 1): ?>
             <!-- Boucle sur tous les trajets -->
              <?php foreach ($trips as $trip): ?>
                 <tr>
-                    <td><?= htmlspecialchars($trip['departure_city']) ?>
-                    <td><?= htmlspecialchars($trip['arrival_city']) ?>
-                    <td><?= date('d/m/Y H:i', strtotime($trip['departure_city'])) ?>
+                    <td><?= htmlspecialchars($trip['departure_city']) ?> </td>
+                    <td><?= htmlspecialchars($trip['arrival_city']) ?> </td>
+                    <td>
+                        <?php 
+                        if (!empty($trip['departure_datetime']) && strtotime($trip['departure_datetime']) !== false) {
+                        echo date('d/m/Y H:i', strtotime($trip['departure_datetime']));
+                        } else {
+                        echo '<span class="text-muted">Date non définie</span>';
+                        }
+                        ?>
+                    </td>
+
+
                     <td><?= htmlspecialchars($trip['brand']) ?>
                     <td><?= htmlspecialchars($trip['seats_available']) ?>
                     <td><?= htmlspecialchars($trip['price']); ?> euros

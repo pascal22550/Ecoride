@@ -294,23 +294,33 @@ public function register() {
         $vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            // Récupération des données du formulaire
+            $departure_city = $_POST['departure_city'] ?? '';
+            $arrival_city = $_POST['arrival_city'] ?? '';
+            $departure_datetime = $_POST['departure_datetime'] ?? '';
+            $arrival_datetime = $_POST['arrival_datetime'] ?? '';
+            $vehicle_id = $_POST['vehicle_id'] ?? '';
+            $seats_available = $_POST['seats_available'] ?? '';
+            $price = $_POST['price'] ?? '';
 
-            $arrival_datetime = $_POST['arrival_datetime']; 
+            // Conversion au bon format DATETIME pour MySQL
+            $departure_datetime = date('Y-m-d H:i:s', strtotime($departure_datetime));
+            $arrival_datetime = date('Y-m-d H:i:s', strtotime($arrival_datetime));
 
+            // Préparation et exécution de la requête
             $stmt = $db->prepare("INSERT INTO trips
-                (user_id, vehicle_id, departure_city, arrival_city, departure_datetime, seats_available, price)
-                VALUES (?, ?, ?, ?, ?, ?, ?)");
+                (user_id, vehicle_id, departure_city, arrival_city, departure_datetime, arrival_datetime, seats_available, price)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
             $stmt->execute([
-
                 $_SESSION['user_id'],
                 $_POST['vehicle_id'],
                 $_POST['departure_city'],
                 $_POST['arrival_city'],
                 $_POST['departure_datetime'],
+                $_POST['arrival_datetime'],
                 $_POST['seats_available'],
                 $_POST['price'],
-                $arrival_datetime,
             ]);
 
             $_SESSION['flash_success'] = " Trajet créé avec succès.";
@@ -367,11 +377,15 @@ public function register() {
         // Si soumission du formulaire
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+            $departure_datetime = date('Y-m-d H:i:s', strtotime($_POST['departure_datetime']));
+            $arrival_datetime = date('Y-m-d H:i:s', strtotime($_POST['arrival_datetime']));
+
             $stmt = $db->prepare("UPDATE trips SET departure_city = ?, arrival_city = ?, departure_datetime = ?, arrival_datetime = ?, seats_available = ?, price = ? WHERE id = ? AND user_id = ?");
             $stmt->execute([
                 $_POST['departure_city'],
                 $_POST['arrival_city'],
-                $_POST['departure_datetime'],
+                $departure_datetime,
+                $arrival_datetime,
                 $_POST['seats_available'],
                 $_POST['price'],
                 $trip_id,

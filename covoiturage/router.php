@@ -92,8 +92,9 @@ switch ($page) {
         $controller->searchResults();
         break;
 
-    /* Permettre à un visiteur de voir le detail d'un trajet */
+    /* fonctionnement trip-details et tripDetails */
     case 'trip-details':
+    case 'trip-Details': // supporte aussi cette écriture
         $controller = new PublicController();
         $controller->tripDetails();
         break;

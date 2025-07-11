@@ -41,7 +41,29 @@
         Trouvez ou proposez des trajets partagés, gagnez des crédits, et aidez la planète.
       </p>
     </section>
-  </main>
+
+      <h2> Trouvez votre covoiturage</h2>
+
+      <form action="index.php" method="GET">
+          <input type="hidden" name="page" value="search-results">
+
+          <label>Ville de départ :
+              <input type="text" name="departure_city" required>
+          </label><br>
+
+          <label>Ville d’arrivée :
+              <input type="text" name="arrival_city" required>
+          </label><br>
+
+          <label>Date de départ :
+              <input type="date" name="date" required>
+          </label><br>
+
+          <button type="submit">Rechercher</button>
+      </form>
+
+
+</main>
 
   <footer>
     <p>© 2025 Covoiturage Écologique - Tous droits réservés</p>

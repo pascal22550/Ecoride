@@ -15,6 +15,7 @@
                 <th>Ecologique</th>
                 <th>Details</th>
                 <th>Durée (h)</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -29,9 +30,18 @@
                     <td><?= $trip['energy'] === 'électrique' ? 'Oui' : 'Non' ?></td>
                     <td><a href="index.php?page=trip-details&id=<?= $trip['id'] ?>">
                     <td><?= $trip['duration'] ?> h</td>
-                        Voir
-                    </a>
-                </td>
+                    <td>
+                        <?php if (!empty($_SESSION['user_id']) && $trip['seats_available'] > 0): ?>
+                            <form method="POST" action="index.php?page=participate">
+                                <input type="hidden" name="trip_id" value="<?= $trip['id'] ?>">
+                                <button type="submit">Participer</button>
+                            </form>
+                        <?php elseif ($trip['seats_available'] == 0): ?>
+                            <span style="color:red;">Complet</span>
+                        <?php else: ?>
+                            <a href="'index.php?page=login">Se Connecter</a>
+                        <?php endif; ?>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
