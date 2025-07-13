@@ -123,6 +123,7 @@ public function register() {
         $db = connectDB();
         $user = null; // garantit que $user existe même en cas d'erreur
         $vehicles = [];
+        $joinedTrips = [];
 
         try {
             // Chargement des infos utilisateur
@@ -145,6 +146,21 @@ public function register() {
             $stmt->execute([$_SESSION['user_id']]);
             $trips = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+            // Charger des trajets où l'utilisateur est passager
+            $stmt = $db->prepare("
+                SELECT t.*, u.firstname AS driver_firstname, v.brand, v.model
+                FROM trip_participants tp
+                JOIN trips t ON tp.trip_id = t.id
+                JOIN users u ON t.user_id = u.id
+                JOIN vehicles v ON t.vehicle_id = v.id
+                WHERE tp.user_id = ?
+                ORDER BY t.departure_datetime DESC
+            ");
+
+            $stmt->execute([$_SESSION['user_id']]);
+            $joinedTrips = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    
         } catch (PDOException $e) {
             echo "Erreur de chargement du profil : " . $e->getMessage();
         }
