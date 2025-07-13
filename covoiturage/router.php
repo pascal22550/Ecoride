@@ -33,7 +33,6 @@ switch ($page) {
 
     /* Ajout nouvelle route pour se deconnecter */
     case 'logout':
-        session_start();
         session_destroy();
         header('Location: index.php?page=home');
         exit;
@@ -98,14 +97,6 @@ switch ($page) {
         $controller = new PublicController();
         $controller->tripDetails();
         break;
-
-    /* Fonctionnement bouton login */
-    case 'login' :
-        require_once 'controllers/UserController.php';
-        $controller = new UserController();
-        $controller->login();
-        break;
-
 
     /* Fonction du bouton participer */
     case 'participate':

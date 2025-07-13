@@ -1,3 +1,14 @@
+<?php if (!empty($_SESSION['flash_success'])): ?>
+    <p style="color: green;"><?= htmlspecialchars($_SESSION['flash_success']) ?></p>
+    <?php unset($_SESSION['flash_success']); ?>
+<?php endif; ?>
+
+<?php if (!empty($_SESSION['flash_error'])): ?>
+    <p style="color: red;"><?= htmlspecialchars($_SESSION['flash_error']) ?></p>
+    <?php unset($_SESSION['flash_error']); ?>
+<?php endif; ?>
+
+
 <h2> Detail du trajet </h2>
 
 <p><strong>Conducteur : </strong></p> <?=htmlspecialchars(string: $trip['firstname']) ?></p>

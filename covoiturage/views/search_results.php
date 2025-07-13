@@ -28,7 +28,7 @@
                     <td><?= htmlspecialchars($trip['price']) ?></td>
                     <td><?= htmlspecialchars($trip['seats_available']) ?></td>
                     <td><?= $trip['energy'] === 'électrique' ? 'Oui' : 'Non' ?></td>
-                    <td><a href="index.php?page=trip-details&id=<?= $trip['id'] ?>">
+                    <td><a href="index.php?page=trip-details&id=<?= $trip['id'] ?>">Voir</a></td>
                     <td><?= $trip['duration'] ?> h</td>
                     <td>
                         <?php if (!empty($_SESSION['user_id']) && $trip['seats_available'] > 0): ?>

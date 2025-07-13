@@ -109,7 +109,7 @@ class PublicController {
 
         
         // Récuperer les avis
-        $avisStmt = $db->prepare("SELECT content, rating FROM reviews WHERE driver_id = ?");
+        $avisStmt = $db->prepare("SELECT content, rating FROM reviews WHERE user_id = ?");
         $avisStmt->execute([$trip['user_id']]);
         $reviews = $avisStmt->fetchAll(PDO::FETCH_ASSOC);
 
