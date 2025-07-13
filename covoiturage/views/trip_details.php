@@ -22,6 +22,16 @@
 
 <h3>Avis sur le conducteur</h3>
 
+<?php if (!empty($_SESSION['user_id']) && $_SESSION['user_id'] !== $trip['user_id'] && $trip['seats_available'] > 0): ?>
+    <form method="POST" action="index.php?page=participate">
+        <input type="hidden" name="trip_id" value="<?= $trip['trip_id'] ?>">
+        <button type="submit">Participer à ce trajet</button>
+    </form>
+<?php elseif ($trip['seats_available'] <= 0): ?>
+    <p style="color:red;">Ce trajet est complet.</p>
+<?php endif; ?>
+
+
 <?php if (!empty($reviews)): ?>
     <ul>
         <?php foreach ($reviews as $r): ?>

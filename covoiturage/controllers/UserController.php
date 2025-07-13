@@ -400,7 +400,62 @@ public function register() {
         // Afficher le formulaire
         require 'views/edit_trip.php';
     }
+    public function participateTrip() {
+        if (empty($_SESSION['user_id'])) {
+            header('Location: index.php?page=login');
+            exit;
+        }
 
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['trip_id'])) {
+            $trip_id = intval($_POST['trip_id']);
+            $user_id = $_SESSION['user_id'];
+
+            $db = connectDB();
+
+            try {
+                // Vérifie s'il reste des places
+                $stmt = $db->prepare("SELECT seats_available FROM trips WHERE id = ?");
+                $stmt->execute([$trip_id]);
+                $trip = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if (!$trip || $trip['seats_available'] <= 0) {
+                    $_SESSION['flash_error'] = "Désolé, ce trajet est complet.";
+                    header('Location: index.php?page=search');
+                    exit;
+                }
+
+                // Vérifie si l'utilisateur est déjà inscrit
+                $stmt = $db->prepare("SELECT * FROM trip_participants WHERE trip_id = ? AND user_id = ?");
+                $stmt->execute([$trip_id, $user_id]);
+                if ($stmt->fetch()) {
+                    $_SESSION['flash_error'] = "Vous êtes déjà inscrit à ce trajet.";
+                    header('Location: index.php?page=search');
+                    exit;
+                }
+
+                // Inscription
+                $stmt = $db->prepare("INSERT INTO trip_participants (trip_id, user_id) VALUES (?, ?)");
+                $stmt->execute([$trip_id, $user_id]);
+
+                // Mise à jour des places
+                $stmt = $db->prepare("UPDATE trips SET seats_available = seats_available - 1 WHERE id = ?");
+                $stmt->execute([$trip_id]);
+
+                $_SESSION['flash_success'] = "Vous êtes inscrit à ce trajet";
+                header('Location: index.php?page=profile');
+                exit;
+            } catch (PDOException $e) {
+                $_SESSION['flash_error'] = "Erreur de base de données : " . $e->getMessage();
+                header('Location: index.php?page=search');
+                exit;
+            }
+        } else {
+            $_SESSION['flash_error'] = "Requête invalide.";
+            header('Location: index.php?page=search');
+            exit;
+        }
+    }
+    
 }
 
     

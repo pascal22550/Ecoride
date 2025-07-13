@@ -39,7 +39,7 @@
                         <?php elseif ($trip['seats_available'] == 0): ?>
                             <span style="color:red;">Complet</span>
                         <?php else: ?>
-                            <a href="'index.php?page=login">Se Connecter</a>
+                            <a href="index.php?page=login">Se Connecter</a>
                         <?php endif; ?>
                     </td>
                 </tr>

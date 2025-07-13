@@ -99,6 +99,21 @@ switch ($page) {
         $controller->tripDetails();
         break;
 
+    /* Fonctionnement bouton login */
+    case 'login' :
+        require_once 'controllers/UserController.php';
+        $controller = new UserController();
+        $controller->login();
+        break;
+
+
+    /* Fonction du bouton participer */
+    case 'participate':
+        require_once 'controllers/UserController.php';
+        $controller = new UserController();
+        $controller->participateTrip();
+        break;
+
     /* Page qui s'affiche en cas d'erreur */
     default:
         http_response_code(404);
