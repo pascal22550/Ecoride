@@ -49,24 +49,15 @@
     <h3>Avis sur le conducteur</h3>
     <ul>
         <?php foreach ($reviews as $r): ?>
-            <li style="margin-bottom:10px;">
-                <strong>Note : </strong> <?= str_repeat("⭐", $r['rating']) ?> (<?= $r['rating'] ?>/5)<br>
-                <strong>Commentaire : </strong> <?= htmlspecialchars($r['content']) ?><br>
-                <em style="color:gray;"> 
-                    Posté le 
-                    <?php
-                        if (!empty($r['created_at'])){
-                            echo date('d/m/Y à H:i', strtotime($r['created_at']));
-                        } else {
-                            echo "Date inconnue";
-                        }
-                    ?>
-                </em>
-            </li>
+            <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 6px; background-color: #f9f9f9;">
+                <strong>Note :</strong> <?= $r['rating'] ?>/5<br>
+                <em>Date : </em>
+                <?= !empty($r['created_at']) ? date('d/m/Y H:i', strtotime($r['created_at'])) : 'Date inconnue' ?><br>
+                <p style="margin-top: 5px;"><strong>Commentaire :</strong><br><?= htmlspecialchars($r['content']) ?></p>
+            </div>
         <?php endforeach; ?>
-    </ul>
 <?php else: ?>
-    <p>Aucun avis pour ce conducteur.</p>
+        <p> Aucun avis pour ce conducteur.</p>
 <?php endif; ?>
 
 <?php
@@ -160,15 +151,14 @@ if (!empty($_SESSION['user_id']) && $_SESSION['user_id'] == $trip['user_id']) {
 ?>
 
 <?php if (!empty($reviews_for_passengers)): ?>
-    <h3>Avis laissés sur les passagers</h3>
+    <h3>Avis du conducteur sur sur les passagers</h3>
     <ul>
         <?php foreach ($reviews_for_passengers as $r): ?>
-            <li style="margin-bottom:10px;"> 
-                <strong>Passager :</strong> <?= htmlspecialchars($r['passenger_name']) ?><br>
-                <strong>Note :</strong> <?= str_repeat("⭐", $r['rating']) ?> (<?= $r['rating'] ?>/5)<br>
-                <strong>Commentaire : </strong> <?= htmlspecialchars($r['content']) ?><br>
+            <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 6px; background-color: #eef7ff;">
+                <strong>Passager : </strong> <?= htmlspecialchars($r['passenger_name']) ?><br>
+                <strong>Note :</strong> <?= str_repeat("⭐", (int)$r['rating']) ?> (<?= $r['rating'] ?>/5)<br>
+                <p><strong>Commentaire : </strong><br><?= htmlspecialchars($r['content']) ?></p>
                 <em style="color:gray;">Posté le <?= date('d/m/Y à H:i', strtotime($r['created_at'])) ?></em>
-            </li>
+            </div>
         <?php endforeach; ?>
-    </ul>
-<?php endif; ?>
+    <?php endif; ?>

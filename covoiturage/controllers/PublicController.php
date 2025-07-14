@@ -108,16 +108,17 @@ class PublicController {
         echo "</pre>";
 
         
-        // Récuperer les avis
-        $avisStmt = $db->prepare("SELECT content, rating FROM reviews WHERE driver_id = ?");
-        $avisStmt->execute([$trip['user_id']]);
+        // Récuperer les avis adressé au conducteur par les passagers
+        $avisStmt = $db->prepare("SELECT content, rating, created_at FROM reviews WHERE driver_id = ? AND trip_id = ? ORDER BY created_at DESC");
+        $avisStmt->execute([$trip['user_id'], $trip['trip_id']]);
         $reviews = $avisStmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Avis laissés sur les passagers (par le conducteur)
         $stmt = $db->prepare("SELECT r.*, u.firstname AS passenger_name
                               FROM reviews r
                               JOIN users u ON r.passenger_id = u.id
-                              WHERE r.trip_id = ? AND r.passenger_id IS NOT NULL");
+                              WHERE r.trip_id = ? AND r.passenger_id IS NOT NULL
+                              ORDER BY r.created_at DESC");
         $stmt->execute([$trip['trip_id']]);
         $reviews_for_passengers = $stmt->fetchAll();
 
