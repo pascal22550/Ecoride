@@ -105,22 +105,29 @@ if (!empty($user['is_driver']) && $user['is_driver'] == 1): ?>
                     </td>
 
 
-                    <td><?= htmlspecialchars($trip['brand']) ?>
-                    <td><?= htmlspecialchars($trip['seats_available']) ?>
-                    <td><?= htmlspecialchars($trip['price']); ?> euros
+                    <td><?= htmlspecialchars($trip['brand']) ?></td>
+                    <td><?= htmlspecialchars($trip['seats_available']) ?></td>
+                    <td><?= htmlspecialchars($trip['price']); ?> euros</td>
                     <td>
+
+                        <!-- Bouton voir -->
+                        <a href="index.php?page=trip-details&id=<?= $trip['id'] ?>">
+                            <button>Voir</button>
+                        </a>
+
+                        <!-- Formulaire pour modifier un trajet -->
+                        <a href="index.php?page=edit-trip&id=<?= $trip['id'] ?>">
+                            <button> Modifier</button>
+                        </a>
+
                         <!-- Formulaire pour supprimer un trajet -->
                         <form method="POST" action="index.php?page=delete-trip" onsubmit="return confirm('Supprimer ce trajet ?');">
                             <input type="hidden" name="trip_id" value="<?= $trip['id'] ?>">
                             <button type="submit"> Supprimer</button>
                         </form>
 
-                        <!-- Formulaire pour modifier un trajet -->
-                        <a href="index.php?page=edit-trip&id=<?= $trip['id'] ?>">
-                            <button> Modifier</button>
-                        </a>
                     </td>
-                </td>
+                </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
@@ -160,6 +167,25 @@ if (!empty($user['is_driver']) && $user['is_driver'] == 1): ?>
     <p> Vous n'avez pas encore participé à de trajets.</p>
 <?php endif; ?>
 
+<!-- Avis reçus en tant que conducteur -->
+<?php if (!empty($reviews_received)): ?>
+    <h3>Avis reçus en tant que conducteur</h3>   
+    <ul>
+        <?php foreach ($reviews_received as $r): ?>
+            <li><strong><?= htmlspecialchars($r['reviewer_name'])?></strong> : <?= $r['rating'] ?>/5 - <?= htmlspecialchars($r['content'])?></li>
+        <?php endforeach; ?>
+    </ul> 
+<?php endif; ?>
+
+<!-- Avis donnés en tant que passager -->
+<?php if (!empty($reviews_given)): ?>
+    <h3>Avis donnés en tant que passager</h3>
+    <ul>
+        <?php foreach ($reviews_given as $r): ?>
+            <li><strong><?= htmlspecialchars($r['driver_name']) ?></strong> : <?= $r['rating'] ?>/5 - <?= htmlspecialchars($r['content']) ?></li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>
 
 
 

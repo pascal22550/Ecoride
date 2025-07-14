@@ -165,6 +165,23 @@ public function register() {
             echo "Erreur de chargement du profil : " . $e->getMessage();
         }
 
+            // Avis reçus (en tant que conducteur)
+            $stmt = $db->prepare("SELECT r.rating, r.content, u.firstname AS reviewer_name
+                                  FROM reviews r
+                                  JOIN users u ON r.reviewer_id = u.id
+                                  WHERE r.driver_id = ?");
+            $stmt->execute([$_SESSION['user_id']]);
+            $reviews_received = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Avis donnés (en tant que passager)
+            $stmt = $db->prepare("SELECT r.rating, r.content, u.firstname AS driver_name
+                                  FROM reviews r
+                                  JOIN users u ON r.driver_id = u.id
+                                  WHERE r.reviewer_id = ?");
+            $stmt->execute([$_SESSION['user_id']]);
+            $reviews_given = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
         require 'views/profile.php';
 
     }
@@ -416,63 +433,178 @@ public function register() {
         // Afficher le formulaire
         require 'views/edit_trip.php';
     }
-public function participateTrip() {
-    if (empty($_SESSION['user_id'])) {
-        header('Location: index.php?page=login');
-        exit;
-    }
+    public function participateTrip() {
+        if (empty($_SESSION['user_id'])) {
+            header('Location: index.php?page=login');
+            exit;
+        }
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['trip_id'])) {
-        $trip_id = intval($_POST['trip_id']);
-        $user_id = $_SESSION['user_id'];
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['trip_id'])) {
+            $trip_id = intval($_POST['trip_id']);
+            $user_id = $_SESSION['user_id'];
+
+            $db = connectDB();
+
+            try {
+                // Vérifie s'il reste des places
+                $stmt = $db->prepare("SELECT seats_available FROM trips WHERE id = ?");
+                $stmt->execute([$trip_id]);
+                $trip = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if (!$trip || $trip['seats_available'] <= 0) {
+                    $_SESSION['flash_error'] = "Désolé, ce trajet est complet.";
+                    header('Location: index.php?page=trip-details&id=' .$trip_id);
+                    exit;
+                }
+
+                // Vérifie si l'utilisateur est déjà inscrit
+                $stmt = $db->prepare("SELECT * FROM trip_participants WHERE trip_id = ? AND user_id = ?");
+                $stmt->execute([$trip_id, $user_id]);
+                if ($stmt->fetch()) {
+                    $_SESSION['flash_error'] = "Vous êtes déjà inscrit à ce trajet.";
+                    header('Location: index.php?page=trip-details&id=' . $trip_id);
+                    exit;
+                }
+
+                // Vérifie si l'utilisateur a au moins 1 crédit
+                $stmt = $db->prepare("SELECT credits FROM users WHERE id = ?");
+                $stmt->execute([$user_id]);
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($user['credits'] <= 0) {
+                    $_SESSION['flash_error'] = "Vous n'avez pas assez de crédits pour participer à ce trajet.";
+                    header('Location: index.php?page=search');
+                    exit;
+                }
+
+                // Inscription à un trajet
+                $stmt = $db->prepare("INSERT INTO trip_participants (trip_id, user_id) VALUES (?, ?)");
+                $stmt->execute([$trip_id, $user_id]);
+
+                // Mise à jour du nombre de places
+                $stmt = $db->prepare("UPDATE trips SET seats_available = seats_available - 1 WHERE id = ?");
+                $stmt->execute([$trip_id]);
+
+                // Décrémenter 1 crédit au passager
+                $stmt = $db->prepare("UPDATE users SET credits = credits - 1 WHERE id = ?");
+                $stmt->execute([$user_id]);
+
+                $_SESSION['flash_success'] = "Vous êtes inscrit à ce trajet";
+                header('Location: index.php?page=trip-details&id=' . $trip_id);
+                exit;
+                
+            } catch (PDOException $e) {
+                $_SESSION['flash_error'] = "Erreur de base de données : " . $e->getMessage();
+                header('Location: index.php?page=trip-details&id=' . $trip_id);
+                exit;
+            }
+        } else {
+            $_SESSION['flash_error'] = "Requête invalide.";
+            header('Location: index.php?page=search');
+            exit;
+        }
+    }
+    
+    public function rateDriver() {
+        // Vérifie si l'utilisateur est connecté
+        if (empty($_SESSION['user_id'])) {
+            header('Location: index.php?page=login');
+            exit;
+        }
+
+        // Vérifie que le formulaire est bien en POST
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $trip_id = $_POST['trip_id'] ?? null;
+            $driver_id = $_POST['driver_id'] ?? null;
+            $rating = $_POST['rating'] ?? null;
+            $content = trim($_POST['content'] ?? '');
+            $reviewer_id = $_SESSION['user_id'];
+
+        // Validation basique : tous les champs sont obligatoires
+        if (!$trip_id || !$driver_id || !$rating || empty($content)) {
+            $_SESSION['flash_error'] = "Tous les champs sont obligatoires.";
+            header('Location: index.php?page=trip-details&id=' . $trip_id);
+            exit;
+        }
 
         $db = connectDB();
 
         try {
-            // Vérifie s'il reste des places
-            $stmt = $db->prepare("SELECT seats_available FROM trips WHERE id = ?");
-            $stmt->execute([$trip_id]);
-            $trip = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Insérer la note
+            $passenger_id = $reviewer_id;
+            $stmt = $db->prepare("INSERT INTO reviews (trip_id, reviewer_id, driver_id, passenger_id, rating, content, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+            $stmt->execute([$trip_id, $reviewer_id, $driver_id, $passenger_id, $rating, $content]);
 
-            if (!$trip || $trip['seats_available'] <= 0) {
-                $_SESSION['flash_error'] = "Désolé, ce trajet est complet.";
-                header('Location: index.php?page=trip-details&id=' .$trip_id);
-                exit;
-            }
 
-            // Vérifie si l'utilisateur est déjà inscrit
-            $stmt = $db->prepare("SELECT * FROM trip_participants WHERE trip_id = ? AND user_id = ?");
-            $stmt->execute([$trip_id, $user_id]);
-            if ($stmt->fetch()) {
-                $_SESSION['flash_error'] = "Vous êtes déjà inscrit à ce trajet.";
-                header('Location: index.php?page=trip-details&id=' . $trip_id);
-                exit;
-            }
+            // Ajouter 10 crédits au passager qui a noté
+            $stmt = $db->prepare("UPDATE users SET credits = credits + 10 WHERE id = ?");
+            $stmt->execute([$reviewer_id]);
 
-            // Inscription
-            $stmt = $db->prepare("INSERT INTO trip_participants (trip_id, user_id) VALUES (?, ?)");
-            $stmt->execute([$trip_id, $user_id]);
-
-            // Mise à jour des places
-            $stmt = $db->prepare("UPDATE trips SET seats_available = seats_available - 1 WHERE id = ?");
-            $stmt->execute([$trip_id]);
-
-            $_SESSION['flash_success'] = "Vous êtes inscrit à ce trajet";
-            header('Location: index.php?page=trip-details&id=' . $trip_id);
+            // Succès
+            $_SESSION['flash_success'] = "Merci pour votre avis ! Vous avez gagné 10 crédits.";
+            header('Location: index.php?page=profile');
             exit;
-            
         } catch (PDOException $e) {
-            $_SESSION['flash_error'] = "Erreur de base de données : " . $e->getMessage();
+            $_SESSION['flash_error'] = "Erreur : " . $e->getMessage();
             header('Location: index.php?page=trip-details&id=' . $trip_id);
             exit;
         }
-    } else {
-        $_SESSION['flash_error'] = "Requête invalide.";
-        header('Location: index.php?page=search');
-        exit;
+
+        }  
+ 
+    }
+
+    public function ratePassenger() {
+        if (empty($_SESSION['user_id'])) {
+            header('Location: index.php?page=login');
+            exit;
+        }
+
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $trip_id = $_POST['trip_id'] ?? null;
+                $passenger_id = $_POST['passenger_id'] ?? null;
+                $rating = $_POST['rating'] ?? null;
+                $content = trim($_POST['content'] ?? '');
+                $reviewer_id = $_SESSION['user_id'];
+
+                // Validation
+                if (!$trip_id || !$passenger_id || !$rating || empty($content)) {
+                    $_SESSION['flash_error'] = "Tous les champs sont obligatoires";
+                    header('Location: index.php?page=trip-details&id=' . $trip_id);
+                    exit;
+                }
+
+                // Vérifie que le passager a bien participé
+
+                try {
+
+                $db = connectDB();
+
+                $stmt = $db->prepare("SELECT * FROM trip_participants WHERE trip_id = ? AND user_id = ?");
+                $stmt->execute([$trip_id, $passenger_id]);
+                if (!$stmt->fetch()) {
+                    $_SESSION['flash_error'] = "Ce passager n'a pas participé à ce trajet.";
+                    header('Location: index.php?page=trip-details&id=' . $trip_id);
+                    exit;
+                }
+
+                // Insertion de l'avis
+                $stmt = $db->prepare("INSERT INTO reviews (trip_id, reviewer_id, passenger_id, rating, content, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
+                $stmt->execute([$trip_id, $reviewer_id, $passenger_id, $rating, $content]);
+
+                // Récompense : le conducteur gagne 5 crédits 
+                $stmt = $db->prepare("UPDATE users SET credits = credits + 5 WHERE id = ?");
+                $stmt->execute([$reviewer_id]);
+
+                $_SESSION['flash_success'] = "Avis enregistré avec succès.";
+                header('Location: index.php?page=trip-details&id=' . $trip_id);
+                exit;
+                
+            } catch (PDOException $e) {
+                $_SESSION['flash_error'] = "Erreur : " . $e->getMessage();
+                header('Location: index.php?page=profile');
+                exit;
+            }
+        }
     }
 }
-    
-}
-
-    

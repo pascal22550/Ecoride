@@ -109,9 +109,17 @@ class PublicController {
 
         
         // Récuperer les avis
-        $avisStmt = $db->prepare("SELECT content, rating FROM reviews WHERE user_id = ?");
+        $avisStmt = $db->prepare("SELECT content, rating FROM reviews WHERE driver_id = ?");
         $avisStmt->execute([$trip['user_id']]);
         $reviews = $avisStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Avis laissés sur les passagers (par le conducteur)
+        $stmt = $db->prepare("SELECT r.*, u.firstname AS passenger_name
+                              FROM reviews r
+                              JOIN users u ON r.passenger_id = u.id
+                              WHERE r.trip_id = ? AND r.passenger_id IS NOT NULL");
+        $stmt->execute([$trip['trip_id']]);
+        $reviews_for_passengers = $stmt->fetchAll();
 
         require 'views/trip_details.php';
     }

@@ -105,6 +105,18 @@ switch ($page) {
         $controller->participateTrip();
         break;
 
+    /* Fonctionnement de la notation du conducteur */
+    case 'rate-driver':
+        $controller = new UserController();
+        $controller->rateDriver();
+        break;
+
+    /* Permettre à un conducteur de noter un passager */
+    case 'rate-passenger':
+        $controller = new UserController();
+        $controller->ratePassenger();
+        break;
+
     /* Page qui s'affiche en cas d'erreur */
     default:
         http_response_code(404);
