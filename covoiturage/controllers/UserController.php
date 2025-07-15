@@ -173,6 +173,11 @@ public function register() {
             $stmt->execute([$_SESSION['user_id']]);
             $reviews_received = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+            // Calcul de la note moyenne du conducteur
+            $stmt = $db->prepare("SELECT AVG(rating) FROM reviews WHERE driver_id = ?");
+            $stmt->execute([$_SESSION['user_id']]);
+            $avgDriverRating = $stmt->fetchColumn();
+
             // Avis donnés (en tant que passager)
             $stmt = $db->prepare("SELECT r.rating, r.content, u.firstname AS driver_name
                                   FROM reviews r
@@ -180,6 +185,11 @@ public function register() {
                                   WHERE r.reviewer_id = ?");
             $stmt->execute([$_SESSION['user_id']]);
             $reviews_given = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Calcul de la note moyenne en tant que passager
+            $stmt = $db->prepare("SELECT AVG(rating) FROM reviews WHERE passenger_id = ?");
+            $stmt->execute([$_SESSION['user_id']]);
+            $avgPassengerRating = $stmt->fetchColumn();
 
 
         require 'views/profile.php';

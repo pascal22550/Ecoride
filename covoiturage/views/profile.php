@@ -12,8 +12,40 @@ endif;
     <p><strong>Nom : </strong> <?= htmlspecialchars($user['lastname']) ?></p>
     <p><strong>Email : </strong> <?= htmlspecialchars($user['email']) ?></p>
     <p><strong>Crédits : </strong> <?= htmlspecialchars($user['credits']) ?> </p>
-<?php else:  ?>
-    <p> Impossible de charger vos informations. </p>
+
+
+<style>
+.star {
+    color: #ccc;
+    font-size: 10px;
+}
+.star.filled {
+    color: gold;
+}
+</style>
+
+<?php if (!empty($avgDriverRating)): ?>
+    <p><strong>Note moyenne en tant que conducteur :</strong> <?= number_format($avgDriverRating, 1) ?>/5</p>
+    <p>
+        <?php
+        for ($i = 1; $i <= 5; $i++) {
+            $filled = $i <= round($avgDriverRating);
+            echo '<span class="star' . ($filled ? ' filled' : '') . '">*</span>';
+        }
+        ?>
+    </p>
+<?php endif; ?>
+
+<?php if (!empty($avgPassengerRating)): ?>
+    <p><strong>Note moyenne en tant que passager :</strong> <?= number_format($avgPassengerRating, 1) ?>/5</p>
+    <p>
+        <?php
+        for ($i = 1; $i <= 5; $i++) {
+            $filled = $i <= round($avgPassengerRating);
+            echo '<span class="star' . ($filled ? ' filled': '') . '">*</span>';
+        }
+        ?>
+    </p>
 <?php endif; ?>
 
 <p>
@@ -187,13 +219,6 @@ if (!empty($user['is_driver']) && $user['is_driver'] == 1): ?>
     </ul>
 <?php endif; ?>
 
-
-
-
-            </tr>
-        </thead>
-    </table>
-
 <!-- Ajouter un bouton "ajouter un trajet dans le profil chauffeur" -->
 <?php if (!empty($user['is_driver']) && $user['is_driver'] == 1): ?>
     <p>
@@ -202,3 +227,5 @@ if (!empty($user['is_driver']) && $user['is_driver'] == 1): ?>
         </a>
     </p>
 <?php endif; ?>
+
+<?php endif;
