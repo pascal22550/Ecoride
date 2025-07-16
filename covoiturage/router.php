@@ -117,6 +117,23 @@ switch ($page) {
         $controller->ratePassenger();
         break;
 
+    /* Annulation la participation à un trajet */
+    case 'cancel-participation':
+        $controller = new UserController();
+        $controller->cancelParticipation();
+        break;
+
+    /* Action de démarrage de trajet */
+    case 'start-trip':
+        $controller = new UserController();
+        $controller->startTrip();
+        break;
+
+    /* Action de fin de trajet */
+    case 'complete-trip':
+        $controller = new UserController();
+        $controller->completeTrip();
+
     /* Page qui s'affiche en cas d'erreur */
     default:
         http_response_code(404);

@@ -24,6 +24,17 @@
 <p><strong>Prix: </strong> <?= htmlspecialchars($trip['price']) ?> euros</p>
 <p><strong>Places restantes: </strong> <?= htmlspecialchars($trip['seats_available']) ?></p>
 
+<h3>Passagers inscrits</h3>
+<?php if (!empty($passengers)): ?>
+    <ul>
+        <?php foreach ($passengers as $p): ?>
+            <li><?= htmlspecialchars($p['firstname'] . ' ' . strtoupper($p['lastname'])) ?></li>
+        <?php endforeach; ?>
+    </ul>
+<?php else: ?>
+    <p>Aucun passager encore inscrit.</p>
+<?php endif; ?>
+
 <h3>Véhicule</h3>
 <p><strong>Marque:</strong> <?= htmlspecialchars($trip['brand']) ?></p>
 <p><strong>Modèle:</strong> <?= htmlspecialchars($trip['model']) ?></p>

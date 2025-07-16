@@ -122,6 +122,18 @@ class PublicController {
         $stmt->execute([$trip['trip_id']]);
         $reviews_for_passengers = $stmt->fetchAll();
 
+        // Récupérer les passagers inscrits à ce trajet
+        $stmt = $db->prepare("
+            SELECT u.firstname, u.lastname
+            FROM trip_participants tp
+            JOIN users u ON tp.user_id = u.id
+            WHERE tp.trip_id = ?
+        ");
+        $stmt->execute([$trip_id]);
+        $passengers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
         require 'views/trip_details.php';
+
     }
 }

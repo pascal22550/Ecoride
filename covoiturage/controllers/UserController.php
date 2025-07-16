@@ -617,4 +617,109 @@ public function register() {
             }
         }
     }
-}
+
+    public function cancelParticipation()
+    {
+        if (empty($_SESSION['user_id'])) {
+            header('Location: index.php?page=login');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['trip_id'])) {
+            $trip_id = $_POST['trip_id'];
+            $user_id = $_SESSION['user_id'];
+
+            $db = connectDB();
+
+            // Supprimer la ligne de participation
+            $stmt = $db->prepare("DELETE FROM trip_participants WHERE user_id = ? AND trip_id = ?");
+            $success = $stmt->execute([$user_id, $trip_id]);
+
+            if ($success) {
+                $_SESSION['flash_success'] = " Vous avez annulé votre participation au trajet.";
+            } else {
+                $_SESSION['flash_error'] = "Erreur lors de l'annulation.";
+            }
+        }
+
+        header('Location: index.php?page=profile');
+        exit;
+        }
+
+    public function startTrip() {
+        if (empty($_SESSION['user_id'])) {
+            $_SESSION['flash_error'] = "Vous devez être connecté pour démarer un trajet.";
+            header('Location: index.php?page=login');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $trip_id = $_POST['trip_id'] ?? null;
+
+            if ($trip_id) {
+                $db = connectDB();
+
+                // Vérifier que l'utilisateur est bien le conducteur
+                $stmt = $db->prepare("SELECT * FROM trips WHERE id = ? AND user_id = ?");
+                $stmt->execute([$trip_id, $_SESSION['user_id']]);
+                $trip = $stmt->fetch();
+
+                if ($trip) {
+                    // Mettre à jour le champ is_started
+                    $stmt = $db->prepare("UPDATE trips SET is_started = 1 WHERE id = ?");
+                    $stmt->execute([$trip_id]);
+
+                    $_SESSION['flash_success'] = "Trajet démarré avec succès.";
+                    header("Location: index.php?page=profile");
+                    exit;
+                } else {
+                    $_SESSION['flash_error'] = "Vous n'êtes pas autorisé à démarrer ce trajet.";
+                }
+            } else {
+                $_SESSION['flash_error'] = "Trajet introuvable.";
+            }
+
+            header("Location: index.php?page=profile");
+            exit;
+                }
+            }
+
+    public function completeTRip() {
+        if (empty($_SESSION['user_id'])) {
+            $_SESSION['flash_error'] = "Connexion requise.";
+            header("Location: index.php?page=login");
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $trip_id = $_POST['trip_id'] ?? null;
+
+            if ($trip_id) {
+                $db = connectDB();
+
+                // Vérifie que l'utilisateur est bien le conducteur
+                $stmt = $db->prepare("SELECT * FROM trips WHERE id = ? AND user_id = ?");
+                $stmt->execute([$trip_id, $_SESSION['user_id']]);
+                $trip = $stmt->fetch();
+
+                if ($trip) {
+                    // Mettre à jour le trajet comme terminé
+                    $stmt = $db->prepare("UPDATE trips SET is_completed = 1 WHERE id = ?");
+                    $stmt->execute([$trip_id]);
+
+                    $_SESSION['flash-success'] = "Trajet terminé avec succès.";
+                } else {
+                    $_SESSION['flash_error'] = "Action non autorisée pour ce trajet.";
+                }
+            } else {
+                $_SESSION['flash_error'] = "Identifiant du trajet manquant.";
+            }
+        }
+
+        header("Location: index.php?page=profile");
+        exit;
+        }
+
+    }
+
+
