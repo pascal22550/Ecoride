@@ -157,19 +157,24 @@ if (!empty($user['is_driver']) && $user['is_driver'] == 1): ?>
                             <button type="submit"> Supprimer</button>
                         </form>
 
-                        <?php if (!$trip['is_started']): ?>
+                        <!-- Ajouter ici les boutons Démarrer / Terminer dynamiquement -->
+                        <?php if ($trip['is_completed']): ?>
+                            <span style="color: green;">Trajet terminé</span>
+
+                        <?php elseif ($trip['is_started']): ?>
+                           <form method="POST" action="index.php?page=complete-trip" onsubmit="return confirm('Marquer ce covoiturage comme terminé ?');">
+                                <input type="hidden" name="trip_id" value="<?= $trip['id'] ?>">
+                                <button type="submit">✅ Arrivée à destination</button>
+                            </form>
+
+                        <?php else: ?>
                             <form method="POST" action="index.php?page=start-trip" onsubmit="return confirm('Démarrer ce covoiturage ?');">
                                 <input type="hidden" name="trip_id" value="<?= $trip['id'] ?>">
-                                <button type="submit">Démarrer</button>
+                                <button type="submit">🟢 Démarrer</button>
                             </form>
-                        <?php elseif (!$trip['is_completed']): ?>
-                            <form method="POST" action="index.php?page=complete-trip" onsubmit="return confirm('Marquer ce covoiturage comme terminé ?');">
-                                <input type="hidden" name="trip_id" value="<?= $trip['id'] ?>">
-                                <button type="submit">Terminer</button>
-                            </form>
-                        <?php else: ?>
-                            <span style="color: green;"> Terminé </span>
+
                         <?php endif; ?>
+
                         
                     </td>
                 </tr>

@@ -714,6 +714,39 @@ public function register() {
             } else {
                 $_SESSION['flash_error'] = "Identifiant du trajet manquant.";
             }
+
+                // Après avoir mis à jour le statut du trajet :
+                $stmt = $db->prepare("UPDATE trips SET is_completed = 1 WHERE id = ?");
+                $stmt->execute([$trip_id]);
+
+                // Récupération des passagers
+                $stmt = $db->prepare("
+                    SELECT u.email, u.firstname
+                    FROM trip_participants tp
+                    JOIN users u ON tp.user_id = u.id
+                    WHERE tp.trip_id = ?
+                ");
+                $stmt->execute([$trip_id]);
+                $passengers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Envoi de mail à chaque passager
+                foreach ($passengers as $p) {
+                    $to = $p['email'];
+                    $subject = "Confirmation du trajet terminé";
+                    $message = "Bonjour " . htmlspecialchars($p['firstname']) . ",\n\nLe covoiturage auquel vous avez participé est terminé.\n\nMerci de vous rendre dans votre espace personnel pour confirmer que tout s'est bien passé, laisser une note et un avis.\n\n Merci pour votre confiance.\n\nL'équipe EcoRide";
+                    
+                    // Pour tester en local avec MAMP, écrire dans un fichier plutôt qu'envoyer vraiment
+                    // file_put_contents('emails/debut_mail_' .uniqid() . '.txt', $message);
+
+                    mail($to, $subject, $message); // A activer uniquement si le serveur est prêt à envoyer des mails
+                }
+
+                $_SESSION['flash_success'] = "Trajet marqué comme temriné. Des emails ont été envoyés aux passagers.";
+                header('Location: index.php?page=profile');
+                exit;
+
+
+
         }
 
         header("Location: index.php?page=profile");
