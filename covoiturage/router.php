@@ -134,6 +134,12 @@ switch ($page) {
         $controller = new UserController();
         $controller->completeTrip();
 
+    /* Action de confirmation du voyage */
+    case 'confirm-trip':
+        $controller = new UserController();
+        $controller->confirmTrip();
+        break;
+
     /* Page qui s'affiche en cas d'erreur */
     default:
         http_response_code(404);

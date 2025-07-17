@@ -198,6 +198,7 @@ if (!empty($user['is_driver']) && $user['is_driver'] == 1): ?>
                 <th>Date/Heure</th>
                 <th>Véhicule</th>
                 <th>Prix</th>
+                <th>Confirmation</th>
             </tr>
         </thead>
         <tbody>
@@ -209,6 +210,31 @@ if (!empty($user['is_driver']) && $user['is_driver'] == 1): ?>
                     <td><?= date('d/m/Y H:i', strtotime($trip['departure_datetime'])) ?></td>
                     <td><?= htmlspecialchars($trip['brand'] . ' ' . $trip['model']) ?></td>
                     <td><?= htmlspecialchars($trip['price']) ?></td>
+
+                    <td>
+                        <?php if ($trip['is_completed'] && !$trip['is_confirmed']): ?>
+                            <!-- Formulaire de confirmation positive -->
+                             <form method="POST" action="index.php?page=confirm-trip" style="display:inline;">
+                                <input type="hidden" name="trip_id" value="<?= $trip['id'] ?>">
+                                <input type="hidden" name="status" value="ok">
+                                <button type="submit">✅ Tout s'est bien passé </button> 
+                            </form>
+
+                            <!-- Formulaire de signalement -->
+                            <form method="POST" action="index.php?page=confirm-trip" style="display:inline;">
+                                <input type="hidden" name="trip_id" value="<?= $trip['id'] ?>">
+                                <input type="hidden" name="status" value="problem">
+                                <button type="submit">❌ Signaler un problème</button>
+                            </form>
+                        <?php elseif ($trip['is_confirmed'] == 1): ?>
+                            <span style="color:green;">Validé</span>
+                        <?php elseif ($trip['is_confirmed'] == -1): ?>
+                            <span style="color:red;">Problème signalé</span>
+                        <?php else: ?>
+                            <span>En attente de validation</span>
+                        <?php endif; ?>
+                    </td>
+                    
                     <td>
                         <form method="POST" action="index.php?page=cancel-participation" onsubmit="return confirm('Annuler votre participation à ce trajet ?');">
                             <input type="hidden" name="trip_id" value="<?= $trip['id'] ?>">

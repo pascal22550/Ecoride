@@ -148,7 +148,7 @@ public function register() {
 
             // Charger des trajets où l'utilisateur est passager
             $stmt = $db->prepare("
-                SELECT t.*, u.firstname AS driver_firstname, v.brand, v.model
+                SELECT t.*, tp.is_confirmed, u.firstname AS driver_firstname, v.brand, v.model
                 FROM trip_participants tp
                 JOIN trips t ON tp.trip_id = t.id
                 JOIN users u ON t.user_id = u.id
@@ -753,6 +753,53 @@ public function register() {
         exit;
         }
 
+    public function confirmTrip() {
+        if (empty($_SESSION['user_id'])) {
+            header('Location: index.php?page=login');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $trip_id = $_POST['trip_id'] ?? null;
+            $status = $_POST['status'] ?? null;
+            $user_id = $_SESSION['user_id'];
+
+            if (!$trip_id || !$status) {
+                $_SESSION['flash_error'] = "Informations manquantes.";
+                header('Location: index.php?page=profile');
+                exit;
+            }
+
+            $db = connectDB();
+
+            // Mise à jour de la confirmation dans la table trip_participants
+            $stmt = $db->prepare("UPDATE trip_participants SET is_confirmed = ? WHERE trip_id = ? AND user_id = ?");
+            $is_confirmed = ($status === 'ok') ? 1 : -1;
+            $stmt->execute([$is_confirmed, $trip_id, $user_id]);
+
+            // Si c'était une validation positive, on crédite le conducteur
+            if ($is_confirmed === 1) {
+                // On récupère l'ID du conducteur et le prix du trajet
+                $stmt = $db->prepare("SELECT t.user_id AS driver_id, t.price FROM trips t WHERE t.id = ?");
+                $stmt->execute([$trip_id]);
+                $trip = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($trip) {
+                    $stmt = $db->prepare("UPDATE users SET credits = credits + ? WHERE id = ?");
+                    $stmt->execute([$trip['price'], $trip['driver_id']]);
+                }
+            }
+
+            $_SESSION['flash_success'] = "Merci pour votre retour sur le trajet.";
+            header('Location: index.php?page=profile');
+            exit;
+        }
+
+        http_response_code(405);
+        echo "Methode non autorisée.";
     }
+
+    }
+
 
 
