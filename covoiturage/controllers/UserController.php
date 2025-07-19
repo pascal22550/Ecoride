@@ -799,7 +799,192 @@ public function register() {
         echo "Methode non autorisée.";
     }
 
+    public function employeeDashboard() {
+        if (empty($_SESSION['user_id'])) {
+            header('Location: index.php?page=login');
+            exit;   
+        }
+
+        $db = connectDB();
+
+        // Vérifie que c'est bien un employé
+        $stmt = $db->prepare("SELECT is_employee FROM users WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user || $user['is_employee'] != 1) {
+            $_SESSION['flash_error'] = "Accès Interdit.";
+            header('Location: index.php?page=profile');
+            exit;
+        }
+
+        // Avis à valider
+        $stmt = $db->query("
+            SELECT r.*, u.firstname AS reviewer_name, t.id AS trip_id
+            FROM reviews r
+            JOIN users u ON r.reviewer_id = u.id
+            JOIN trips t ON r.trip_id = t.id
+            WHERE r.status = 'pending'
+        ");
+        $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Trajets problématiques
+        $stmt = $db->query("
+            SELECT t.*, d.firstname AS driver_firstname, p.firstname AS passenger_firstname, p.email AS passenger_email
+            FROM trips t
+            JOIN users d ON t.user_id = d.id
+            JOIN trip_participants tp ON tp.trip_id = t.id
+            JOIN users p ON tp.user_id = p.id
+            WHERE tp.is_confirmed = -1
+        ");
+        $problems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Historique des avis modérés (validés ou rejetés)
+        $stmt = $db->query("
+            SELECT r.*, u.firstname AS reviewer_name, t.id AS trip_id
+            FROM reviews r
+            JOIN users u ON r.reviewer_id = u.id
+            JOIN trips t ON r.trip_id = t.id
+            WHERE r.status IN ('approved', 'rejected')
+            ORDER BY r.created_at DESC
+        ");
+        $moderated_reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Obligatoire pour pouvoir afficher la vue
+        require 'views/employee_dashboard.php';
     }
+
+    public function validateReview() {
+        if (!empty($_SESSION['user_id'])) {
+            header('Location: index.php?page=login');
+            exit;
+        }
+
+        $db = connectDB();
+
+        // Vérifie que l'utilisateur est bien un employé
+        $stmt = $db->prepare("SELECT is_employee FROM users WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$user || $user['is_employee'] != 1) {
+            $_SESSION['flash_error'] = "Acccès Interdit.";
+            header('Location: index.php?page=profile');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $review_id = $_POST['review_id'] ?? null;
+            $action = $_POST['action'] ?? null;
+
+            if (!$review_id || !in_array($action, ['approve', 'reject'])) {
+                $_SESSION['flash_error'] = "Données invalides.";
+                header('Location: index.php?page=employee-dashboard');
+                exit;
+            }
+
+            $status = ($action === 'approve') ? 'approved' : 'rejected';
+
+            $stmt = $db->prepare("UPDATE reviews SET status = ? WHERE id = ?");
+            $stmt->execute([$status, $review_id]);
+
+            $_SESSION['flash_success'] = "Avis mis à jour avec succès.";
+            header('Location: index.php?page=employee-dashboard');
+            exit;
+        }
+
+        http_response_code(485);
+        echo "Methode non autorisée";
+        }
+
+    public function moderateReview() {
+    if (empty($_SESSION['user_id'])) {
+        header('Location: index.php?page=moderate-review');
+        exit;
+    }
+
+    $db = connectDB();
+
+    // Vérifie que c’est bien un employé
+    $stmt = $db->prepare("SELECT is_employee FROM users WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$user || $user['is_employee'] != 1) {
+        $_SESSION['flash_error'] = "Accès interdit.";
+        header('Location: index.php?page=profile');
+        exit;
+    }
+
+    // Vérifie les données du formulaire
+    $review_id = $_POST['review_id'] ?? null;
+    $action = $_POST['action'] ?? null;
+
+    if (!$review_id || !in_array($action, ['approve', 'reject'])) {
+        $_SESSION['flash_error'] = "Données invalides.";
+        header('Location: index.php?page=employee-dashboard');
+        exit;
+    }
+
+    // Met à jour le statut de l'avis
+    $status = ($action === 'approve') ? 'approved' : 'rejected';
+    $stmt = $db->prepare("UPDATE reviews SET status = ? WHERE id = ?");
+    $stmt->execute([$status, $review_id]);
+
+    $_SESSION['flash_success'] = "Avis mis à jour.";
+    header('Location: index.php?page=employee-dashboard');
+    exit;
+
+}
+
+    public function adminDashboard() {
+        if (empty($_SESSION['user_id'])) {
+            header('Location: index.php?page=login');
+            exit;
+        }
+
+        $db = connectDB();
+
+        // Vérifie que l'utilisateur est admin
+        $stmt = $db->prepare("SELECT is_admin FROM users WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user || $user['is_admin'] != 1) {
+            $_SESSION['flash_error'] = "Accès interdit.";
+            header('Location: index.php?page=profile');
+            exit;
+        }
+
+        // Liste des employés
+        $stmt = $db->query("SELECT * FROM users WHERE is_employee = 1");
+        $employees = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Liste des utilisateurs (pour suspension)
+        $stmt = $db->query("SELECT * FROM useres WHERE is_admin = 0");
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Statistiques : trajets par jour
+        $stmt = $db->query("
+            SELECT DATE(departure_datetime) AS date, COUNT(*) AS count
+            FROM trips
+            GROUP BY DATE(departure_datetime)
+            ORDER BY DATE(departure_datetime) DESC
+        ");
+        $tripsPerDay = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Statistiques : total des crédits gagnés
+        $stmt = $db->query("SELECT SUM(credits) AS total_credits FROM users");
+        $creditsData = $stmt->fetch(PDO::FETCH_ASSOC);
+        $totalCredits = $creditsData['total_credits'] ?? 0;
+
+        require 'views/admin_dashboard.php';
+    }
+
+}
+
+
+    
 
 
 

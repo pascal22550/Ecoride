@@ -140,6 +140,24 @@ switch ($page) {
         $controller->confirmTrip();
         break;
 
+    /* Creation de l'espace employee */
+    case 'employee-dashboard':
+        $controller = new UserController();
+        $controller->employeeDashboard();
+        break;
+
+    /* Validation des avis */
+    case 'validate-review':
+        $controller = new UserController();
+        $controller->validateReview();
+        break;
+
+    /* Moderer les avis */
+    case 'moderate-review':
+        $controller = new UserController();
+        $controller->moderateReview();
+        break;
+        
     /* Page qui s'affiche en cas d'erreur */
     default:
         http_response_code(404);
