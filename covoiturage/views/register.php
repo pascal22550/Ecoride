@@ -7,6 +7,8 @@
 <body>
 
     <h1> Inscription </h1>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <?php require 'views/partials/header.php'; ?>
 
     <?php if (!empty($error)): ?>
         <p style="color:red;"><?= htmlspecialchars($error) ?> </p>
@@ -33,4 +35,6 @@
 
 
     </form>
+
+<?php require 'views/partials/footer.php'; ?>
 

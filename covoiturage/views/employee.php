@@ -1,4 +1,6 @@
 <h2> Espace Employé - Trajets signalés </h2>
+<link rel="stylesheet" href="assets/css/style.css">
+<?php require 'views/partials/header.php'; ?>
 
 <?php if (!empty($problemTrips)): ?>
     <table border="1" cellpadding="5" cellspacing="0">
@@ -32,6 +34,7 @@
     <p>Aucun trajet problématique signalé pour l'instant.</p>
 <?php endif; ?>
 
+<?php require 'views/partials/footer.php'; ?>
 
             
 

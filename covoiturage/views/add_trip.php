@@ -25,6 +25,8 @@
     <label>Prix par passager (euro) : </label>
         <input type="number" name="price" step="0.01" required>
 </label><br>
+<link rel="stylesheet" href="assets/css/style.css">
+<?php require 'views/partials/header.php'; ?>
 
 <label>Véhicules :
     <select name="vehicle_id" required>
@@ -39,3 +41,5 @@
 <button type="submit">Créer le trajet</button>
 
 </form>
+
+<?php require 'views/partials/footer.php'; ?>

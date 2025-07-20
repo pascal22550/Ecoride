@@ -10,6 +10,8 @@
         <?php if (!empty($error)): ?>
             <p style="color: red;"><?= htmlspecialchars($error) ?></p>
         <?php endif; ?>
+        <link rel="stylesheet" href="assets/css/style.css">
+        <?php require 'views/partials/header.php'; ?>
 
         <form action="index.php?page=login" method="POST">
             <label for="email">Email : </label>
@@ -23,3 +25,5 @@
 
     </body>
 </html>
+
+<?php require 'views/partials/footer.php'; ?>

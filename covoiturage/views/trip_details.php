@@ -1,4 +1,5 @@
-<pre><?php print_r($trip); ?></pre>
+<link rel="stylesheet" href="assets/css/style.css">
+<?php require 'views/partials/header.php'; ?>
 
 <?php if (!empty($_SESSION['flash_success'])): ?>
     <p style="color: green;"><?= htmlspecialchars($_SESSION['flash_success']) ?></p>
@@ -173,3 +174,5 @@ if (!empty($_SESSION['user_id']) && $_SESSION['user_id'] == $trip['user_id']) {
             </div>
         <?php endforeach; ?>
     <?php endif; ?>
+
+<?php require 'views/partials/footer.php'; ?>

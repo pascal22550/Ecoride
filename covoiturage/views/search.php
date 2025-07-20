@@ -1,4 +1,6 @@
 <h2> Rechercher un covoiturage </h2>
+<link rel="stylesheet" href="assets/css/style.css">
+<?php require 'views/partials/header.php'; ?>
 
 <form method="GET" action="index.php">
     <input type="hidden" name="page" value="search-results">
@@ -39,3 +41,5 @@
     <button type="submit"> Rechercher </button>
 
 </form>
+
+<?php require 'views/partials/footer.php'; ?>

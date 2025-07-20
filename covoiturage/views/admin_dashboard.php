@@ -1,3 +1,6 @@
+<link rel="stylesheet" href="assets/css/style.css">
+<?php require 'views/partials/header.php'; ?>
+
 <h2>Tableau de bord Administrateur</h2>
 
 <?php if (!empty($_SESSION['flash_success'])): ?>
@@ -105,5 +108,4 @@
         <p>Aucun trajet enregistré.</p>
     <?php endif; ?>
 
-
-    
+    <?php require 'views/partials/footer.php'; ?>

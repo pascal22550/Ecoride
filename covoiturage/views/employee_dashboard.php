@@ -1,4 +1,6 @@
 <h2> Employee Employé </h2>
+<link rel="stylesheet" href="assets/css/style.css">
+<?php require 'views/partials/header.php'; ?>
 
 <?php if (!empty($_SESSION['flash_success'])): ?>
     <p style="color: green;"><?= htmlspecialchars($_SESSION['flash_success']) ?></p>
@@ -128,3 +130,6 @@
 
 
     </table>
+
+    <?php require 'views/partials/footer.php'; ?>
+

@@ -6,6 +6,8 @@
 </head>
 <body>
 <h2> Modifier mes informations </h2>
+<link rel="stylesheet" href="assets/css/style.css">
+<?php require 'views/partials/header.php'; ?>
 
 <?php if (!empty($error)): ?>
     <p style="color:red"><?= htmlspecialchars($error) ?></p>
@@ -39,3 +41,5 @@
 
 </body>
 </html>
+
+<?php require 'views/partials/footer.php'; ?>

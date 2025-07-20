@@ -1,12 +1,14 @@
 <h2> Mon espace personnel </h2>
 
+<link rel="stylesheet" href="assets/css/style.css">
+<?php require 'views/partials/header.php'; ?>
+
 <?php
 if (!empty($_SESSION['flash_success'])):
     echo '<p style="color: green;">' . htmlspecialchars($_SESSION['flash_success']) . '</p>';
     unset($_SESSION['flash_success']); // on l'efface après l'affichage
 endif;
 ?>
-<pre><?php print_r($user); ?></pre>
 <?php if (!empty($user)): ?>
     <p><strong>Prénom : </strong> <?= htmlspecialchars($user['firstname']) ?></p>
     <p><strong>Nom : </strong> <?= htmlspecialchars($user['lastname']) ?></p>
@@ -276,6 +278,9 @@ if (!empty($user['is_driver']) && $user['is_driver'] == 1): ?>
             <button>Ajouter un trajet</button>
         </a>
     </p>
+<?php require 'views/partials/footer.php'; ?>
+
 <?php endif; ?>
 
 <?php endif;
+

@@ -1,5 +1,6 @@
 <h2> Déclarer mon rôle </h2>
-
+<link rel="stylesheet" href="assets/css/style.css">
+<?php require 'views/partials/header.php'; ?>
 
 <!-- Formulaire pour sélectionner son rôle (chauffeur ou passager) -->
 <form method="POST" action="index.php?page=select-role">
@@ -24,3 +25,5 @@
 
 <!-- Lien pour retourner sur la page du profil de l'utilisateur -->
 <p><a href="index.php?page=profile"><= Retour au profil </a></p>
+
+<?php require 'views/partials/footer.php'; ?>

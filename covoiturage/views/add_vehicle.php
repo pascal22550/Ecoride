@@ -1,3 +1,6 @@
+<link rel="stylesheet" href="assets/css/style.css">
+<?php require 'views/partials/header.php'; ?>
+
 <h2> Ajouter un véhicule </h2>
 
 <!-- Formulaire d'ajout de véhicule -->
@@ -44,4 +47,6 @@
 
 <!-- Lien pour revenir à la page de profil -->
 <p><a href="index.php?page=profile"><-Retour au profil</a></p>
+
+<?php require 'views/partials/footer.php'; ?>
 

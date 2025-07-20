@@ -1,3 +1,6 @@
+<link rel="stylesheet" href="assets/css/style.css">
+<?php require 'views/partials/header.php'; ?>
+
 <h2> Liste des utilisateurs </h2>
 
 <?php if (!empty($error)): ?>
@@ -34,12 +37,6 @@
     </tbody>
 </table>
 
-
-
-
-
-
-
-
-
 </table>
+
+<?php require 'views/partials/footer.php'; ?>

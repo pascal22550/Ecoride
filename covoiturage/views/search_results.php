@@ -1,4 +1,6 @@
 <h2> Résultats de recherche </h2>
+<link rel="stylesheet" href="assets/css/style.css">
+<?php require 'views/partials/header.php'; ?>
 
 <?php if (empty($trips)): ?>
     <p> Aucun covoiturage trouvé pour cette recherche. </p>
@@ -47,4 +49,6 @@
         </tbody>
     </table>
 <?php endif; ?>
+
+<?php require 'views/partials/footer.php'; ?>
 

@@ -1,4 +1,6 @@
 <h2> Modifier un trajet</h2>
+<link rel="stylesheet" href="assets/css/style.css">
+<?php require 'views/partials/header.php'; ?>
 
 <form method="POST" action="index.php?page=edit-trip&id=<?= $trip['id'] ?>">
     <label>Ville de départ :</label>
@@ -27,3 +29,5 @@
 
     <button type="submit"> Enregistrer</button>
 </form>
+
+<?php require 'views/partials/footer.php'; ?>
