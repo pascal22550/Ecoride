@@ -98,6 +98,10 @@ public function register() {
                         $_SESSION['firstname'] = $user['firstname'];
                         $_SESSION['email'] = $user['email'];
 
+                        // Reconnaître un employé
+                        $_SESSION['is_employee'] = $user['is_employee'] ?? 0;
+                        $_SESSION['is_admin'] = $user['is_admin'] ?? 0;
+
                         // Rediriger vers la page d'accueil ou tableau de bord
                         header('Location: index.php?page=home');
                         exit;
@@ -939,7 +943,7 @@ public function register() {
 
     public function adminDashboard() {
         if (empty($_SESSION['user_id'])) {
-            header('Location: index.php?page=login');
+            header('Location: index.php?page=profile');
             exit;
         }
 
@@ -952,16 +956,17 @@ public function register() {
 
         if (!$user || $user['is_admin'] != 1) {
             $_SESSION['flash_error'] = "Accès interdit.";
-            header('Location: index.php?page=profile');
+            header('Location: index.php?page=admin-dashboard');
             exit;
         }
 
         // Liste des employés
-        $stmt = $db->query("SELECT * FROM users WHERE is_employee = 1");
+        $stmt = $db->prepare("SELECT firstname, lastname, email FROM users WHERE is_employee = 1");
+        $stmt->execute();
         $employees = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Liste des utilisateurs (pour suspension)
-        $stmt = $db->query("SELECT * FROM useres WHERE is_admin = 0");
+        $stmt = $db->query("SELECT * FROM users WHERE is_admin = 0");
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Statistiques : trajets par jour
@@ -979,6 +984,77 @@ public function register() {
         $totalCredits = $creditsData['total_credits'] ?? 0;
 
         require 'views/admin_dashboard.php';
+    }
+    
+    public function createEmployee() {
+        if (empty($_SESSION['user_id']) || empty($_SESSION['is_admin'])) {
+            $_SESSION['flash_error'] = "Accès interdit.";
+            header('Location: index.php?page=login');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $firstname = trim($_POST['firstname'] ?? '');
+            $lastname = trim($_POST['lastname'] ?? '');
+            $email = trim($_POST['email'] ?? '');
+            $password = $_POST['password'] ?? '';
+
+            if (!$firstname || !$lastname || !$email || !$password) {
+                $_SESSION['flash_error'] = "Tous les champs sont obligatoires.";
+                header('Location: index.php?page=create-employee');
+                exit;
+            }
+
+            $db = connectDB();
+
+            // Vérifie que l'email n'est pas déjà utilisée
+            $stmt = $db->prepare("SELECT id FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            $existingUser = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($existingUser) {
+
+                // Met à jour le rôle en employé
+                $stmt = $db->prepare("UPDATE users SET is_employee = 1 WHERE id = ?");
+                $stmt->execute([$existingUser['id']]);
+                $_SESSION['flash_success'] = "Utilisateur existant promu au rôle employé.";
+                header('Location: index.php?page=admin-dashboard');
+                exit;
+            }
+
+            // Sinon, créer un nouvel employé
+            $stmt = $db->prepare("INSERT INTO users (firstname, lastname, email, password, is_employee) VALUES (?, ?, ?, ?, 1)");
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            $stmt->execute([$firstname, $lastname, $email, $hashedPassword]);
+
+            $_SESSION['flash_success'] = "Compte employé créé avec succès.";
+            header('Location: index.php?page=admin-dashboard');
+            exit;
+        }
+
+        require 'views/create_employee.php';
+    }
+
+    public function suspendUser() {
+        if (empty($_SESSION['user_id']) || empty($_SESSION['is_admin'])) {
+            $_SESSION['flash_error'] = "Accès interdit.";
+            header('Location: index.php?page=login');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $userId = $_POST['user_id'] ?? null;
+
+            if ($userId) {
+                $db = connectDB();
+                $stmt = $db->prepare("UPDATE users SET is_suspended = 1 WHERE id = ?");
+                $stmt->execute([$userId]);
+                $_SESSION['flash_success'] = "Utilisateur suspendu.";
+            }
+        }
+
+        header('Location: index.php?page=admin-dashboard');
+        exit;
     }
 
 }

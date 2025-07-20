@@ -157,7 +157,27 @@ switch ($page) {
         $controller = new UserController();
         $controller->moderateReview();
         break;
-        
+
+    /* Page administration pour pouvoir créer un compte employé */
+    case 'create-employee':
+        $controller = new UserController();
+        $controller->createEmployee();
+        break;
+
+    /* Admin-Dashboard */
+
+    case 'admin-dashboard':
+        $controller = new UserController();
+        $controller->adminDashboard();
+        break;
+
+    /* Suspendre un utilisateur */
+
+    case 'suspend-user':
+        $controller = new UserController();
+        $controller->suspendUser();
+        break;
+
     /* Page qui s'affiche en cas d'erreur */
     default:
         http_response_code(404);
