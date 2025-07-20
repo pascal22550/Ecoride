@@ -178,6 +178,13 @@ switch ($page) {
         $controller->suspendUser();
         break;
 
+    /* Ne plus suspendre un utilisateur */
+
+    case 'unsuspend-user':
+        $controller = new UserController();
+        $controller->unsuspendUser();
+        break;
+
     /* Page qui s'affiche en cas d'erreur */
     default:
         http_response_code(404);

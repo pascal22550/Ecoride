@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <title><?= $entreprise['nom'] ?></title>
     <link rel="stylesheet" href="/public/style.css">
-    <?php require 'views/partials/header.php'; ?>
 
 </head>
 <body>
     <h1>Bienvenue sur EcoRide !</h1>
+      <?php require 'views/partials/header.php'; ?>
+
 </body>
 
 <main>
@@ -53,9 +54,8 @@
 
 <?php
 /* Vérification du bon fonctionnement de la connexion de la session */
-session_start();
 if (!empty($_SESSION['firstname'])) {
-  echo "<p>Bonjour, " . htmlspecialchars($_SESSION['firstname']) . " Bravo</p>";
+  echo "<p>Bonjour, " . htmlspecialchars($_SESSION['firstname']) . " ! Merci pour votre connexion et ce geste pour la planète.</p>";
 }
 ?>
 

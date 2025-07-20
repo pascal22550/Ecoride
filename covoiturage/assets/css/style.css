@@ -1,11 +1,11 @@
-/* Reset de base */
+/* La base */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Corps général */
+/* Body */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f4f8fb;

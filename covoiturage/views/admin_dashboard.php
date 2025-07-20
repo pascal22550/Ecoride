@@ -64,14 +64,18 @@
                     <td><?= htmlspecialchars($u['email']) ?></td>
                     <td><?= htmlspecialchars($u['credits']) ?></td>
                     <td>
-                        <?php if (empty($u['is_suspended'])): ?>
-                            <form method="POST" action="index.php?page=suspend-user" onsubmit="return confirm('Suspendre cet utilisateur ?');">
-                                <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
-                                <button type="submit">🚫 Suspendre</button>
-                            </form>
-                        <?php else: ?>
-                            <span style="color: red;">Suspendu</span>
-                        <?php endif; ?>
+                    <?php if (empty($u['is_suspended'])): ?>
+                        <form method="POST" action="index.php?page=suspend-user" onsubmit="return confirm('Suspendre cet utilisateur ?');">
+                            <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+                            <button type="submit">🚫 Suspendre</button>
+                        </form>
+                    <?php else: ?>
+                        <form method="POST" action="index.php?page=unsuspend-user" onsubmit="return confirm('Réactiver cet utilisateur ?');">
+                            <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+                            <button type="submit">✅ Réactiver</button>
+                        </form>
+                    <?php endif; ?>
+
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -83,6 +87,7 @@
 
     <!-- SECTION 3 : Statistiques -->
     <h3>Statistiques</h3>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <p><strong>Total des crédits attribués : </strong> <?= number_format($totalCredits, 2) ?>
 
@@ -109,3 +114,30 @@
     <?php endif; ?>
 
     <?php require 'views/partials/footer.php'; ?>
+
+    <h4>Graphique des trajets par jour:</h4>
+    <canvas id="tripsChart" width="400" height="200"></canvas>
+
+    <script>
+    const ctx = document.getElementById('tripsChart').getContext('2d');
+    const tripsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: <?= json_encode(array_column($tripsPerDay, 'date')) ?>,
+            datasets: [{
+                label: 'Nombre de trajets',
+                data: <?= json_encode(array_column($tripsPerDay, 'count')) ?>,
+                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    </script>

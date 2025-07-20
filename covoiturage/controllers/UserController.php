@@ -1057,6 +1057,30 @@ public function register() {
         exit;
     }
 
+    public function unsuspendUser() {
+        if (empty($_SESSION['is_admin'])) {
+            $_SESSION['flash_error'] = "Accès interdit.";
+            header('Location: index.php?page=login');
+            exit;
+        }
+
+        $user_id = $_POST['user_id'] ?? null;
+        if (!$user_id) {
+            $_SESSION['flash_error'] = "Utilisateur invalide.";
+            header('Location: index.php?page=admin-dashboard');
+            exit;
+        }
+
+        $db = connectDB();
+        $stmt = $db->prepare("UPDATE users SET is_suspended = 0 WHERE id = ?");
+        $stmt->execute([$user_id]);
+
+        $_SESSION['flash_success'] = "Utilisateur réactivé.";
+        header('Location: index.php?page=admin-dashboard');
+        exit;
+}
+
+
 }
 
 
