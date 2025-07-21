@@ -3,7 +3,7 @@ function connectDB(): PDO|null {
     $host = 'localhost';
     $dbname = 'u645697248_Thrkf';
     $username = 'u645697248_fKeCu';
-    $password = 'EcoRide123'; 
+    $password = 'EcoRide2025!'; 
 
     try {
         $db = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
