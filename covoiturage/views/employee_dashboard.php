@@ -1,4 +1,3 @@
-<h2> Employee Employé </h2>
 <link rel="stylesheet" href="assets/css/style.css">
 <?php require 'views/partials/header.php'; ?>
 

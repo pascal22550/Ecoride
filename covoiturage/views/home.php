@@ -7,13 +7,12 @@
 
 </head>
 <body>
-    <h1>Bienvenue sur EcoRide !</h1>
       <?php require 'views/partials/header.php'; ?>
 
 </body>
 
 <main>
-    <img src="public/Nature1.png"<?= $entreprise['image'] ?>" alt="Image entreprise" width="300">
+    <img src="public/EcorideCovoiturage.jpg" alt="EcoRide" class="img-fullscreen">
     <p><?= $entreprise['description'] ?></p>
 
     <section>
